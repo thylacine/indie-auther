@@ -1,0 +1,175 @@
+html {
+	height: 100vh;
+}
+body {
+	background-color: #fff;
+	font-family: Helvetica, Verdana, sans-serif;
+	margin: 0 1em 0 1em;
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+}
+header {}
+header nav {
+	margin-bottom: 1em;
+}
+header nav ol {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+}
+header nav ol li {
+	display: inline;
+	text-align: center;
+	border-top: 2px solid #666;
+	border-bottom: 2px solid #666;
+	border-left: 1px solid #666;
+	border-right: 1px solid #666;
+	padding: .3em .5em .2em .5em;
+}
+header nav ol li:hover {
+	background-color: #ddd;
+}
+header nav ol > li:first-child {
+	border-left: 2px solid #666;
+}
+header nav ol > li:last-child {
+	border-right: 2px solid #666;
+}
+header nav ol a {
+	font-variant-caps: small-caps;
+	text-decoration: none;
+	font-weight: bold;
+}
+h1 {
+	margin-top: 1em;
+	margin-bottom: 1.25em;
+	text-align: center;
+}
+h2 {
+	background-color: #ddd;
+	padding: .25em 0 .1em 0.25em;
+}
+main {
+	flex-grow: 1;
+}
+section {}
+.logo {
+	vertical-align: middle;
+	height: 2em;
+}
+.about {}
+.usage {}
+.copyright {
+	font-size: small;
+}
+.error ul {
+	font-weight: bolder;
+	border: 2px solid red;
+	padding: 1em;
+	background-color: lightsalmon;
+}
+.notification ul {
+	background-color: aliceblue;
+	border: 1px solid slateblue;
+	padding: 1em;
+}
+.legacy-warning {
+	background-color: coral;
+}
+.external {
+	background-image: url("external-link.svg");
+	background-position: right center;
+	background-repeat: no-repeat;
+	padding-right: 13px;
+}
+.information img {
+	max-width: 4em;
+	max-height: 4em;
+	width: 100%;
+	height: auto;
+	vertical-align: middle;
+}
+.uri {
+	font-family: Courier, monospace, serif;
+	font-size: 1em;
+	background-color: lavender;
+	padding: .16em;
+}
+.code {
+	font-family: Courier, monospace, serif;
+	font-size: .75em;
+	white-space: nowrap;
+	overflow-x: hidden;
+}
+.client-identifier {
+	display: inline-block;
+	height: max-content;
+	padding: .5em;
+	border: 1px dotted #999;
+	margin-bottom: .5em;
+}
+.scope {
+	list-style-type: none;
+}
+.scope label {
+	font-variant: small-caps;
+	font-weight: bold;
+}
+.scope .description {
+	font-size: smaller;
+	font-style: italic;
+}
+.scope .disabled {
+	color: grey;
+	background-color: #eee;
+}
+.form-consent button {
+	border-width: thick;
+	font-size: x-large;
+	padding: .5em;
+	margin-left: .75em;
+	margin-right: .75em;
+}
+.button-accept {
+	background-color: lightgreen;
+	border-color: lightgreen;
+}
+.button-decline {
+	background-color: salmon;
+	border-color: salmon;
+}
+.vertical {
+	writing-mode: vertical-lr;
+	vertical-align: bottom;
+}
+table {
+	border: 0;
+	width: 100%;
+}
+thead tr th {
+	background-color: #ddd;
+	vertical-align: bottom;
+	text-align: start;
+}
+tbody tr th {
+	text-align: start;
+}
+tbody tr:nth-child(even) td, tbody tr:nth-child(even) th {
+	background-color: #eee;
+}
+tbody tr:nth-child(odd) td, tbody tr:nth-child(odd) th {}
+footer {
+	text-align: center;
+	width: 100%;
+	border-top: .33em dotted #666;
+	margin-top: 1em;
+}
+footer ol {
+	list-style-type: none;
+	margin: .5em;
+	padding: 0;
+}
+.centered {
+	text-align: center;
+}
