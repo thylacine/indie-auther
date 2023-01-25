@@ -48,7 +48,7 @@ class DatabasePostgres extends Database {
     if (queryLogLevel) {
       const queryScope = _fileScope('pgp:query');
       pgpInitOptions.query = (event) => {
-        this.logger[queryLogLevel](queryScope, '', { ...common.pick(event, ['query', 'params']) });
+        this.logger[queryLogLevel](queryScope, '', { ...common.pick(event || {}, ['query', 'params']) });
       };
     }
 
@@ -59,7 +59,7 @@ class DatabasePostgres extends Database {
     };
 
     // Deophidiate column names in-place, log results
-    pgpInitOptions.receive = (data, result, event) => {
+    pgpInitOptions.receive = ({ data, result, ctx: event }) => {
       const exemplaryRow = data[0];
       for (const prop in exemplaryRow) {
         const camel = common.camelfy(prop);
@@ -72,7 +72,7 @@ class DatabasePostgres extends Database {
       }
       if (queryLogLevel) {
         // Omitting .rows
-        const resultLog = common.pick(result, ['command', 'rowCount', 'duration']);
+        const resultLog = common.pick(result || {}, ['command', 'rowCount', 'duration']);
         this.logger[queryLogLevel](_fileScope('pgp:result'), '', { query: event.query, ...resultLog });
       }
     };

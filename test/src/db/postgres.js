@@ -122,7 +122,7 @@ describe('DatabasePostgres', function () {
             columnTwo: 4,
           },
         ];
-        db.pgpInitOptions.receive(data, result, event)
+        db.pgpInitOptions.receive({ data, result, ctx: event });
         assert(db.logger.debug.called);
         assert.deepStrictEqual(data, expectedData);
       });
@@ -151,7 +151,7 @@ describe('DatabasePostgres', function () {
             columnTwo: 4,
           },
         ];
-        db.pgpInitOptions.receive(data, result, event)
+        db.pgpInitOptions.receive({ data, result, ctx: event });
         assert(db.logger.debug.called);
         assert.deepStrictEqual(data, expectedData);
       });

@@ -186,6 +186,8 @@ class Manager {
     const _scope = _fileScope('getAuthorization');
     this.logger.debug(_scope, 'called', { ctx });
 
+    Manager._sensitiveResponse(res);
+
     ctx.session = Object.assign({}, ctx.session, {
       errorDescriptions: [],
     });
@@ -619,6 +621,8 @@ class Manager {
   async postConsent(res, ctx) {
     const _scope = _fileScope('postConsent');
     this.logger.debug(_scope, 'called', { ctx });
+
+    Manager._sensitiveResponse(res);
 
     // Ensure session exists, persisting any login session data.
     ctx.session = Object.assign({}, ctx.session);
