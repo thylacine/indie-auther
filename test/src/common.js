@@ -2,6 +2,8 @@
 'use strict';
 
 const assert = require('assert');
+const sinon = require('sinon');
+const StubLogger = require('../stub-logger');
 const common = require('../../src/common');
 
 describe('Common', function () {
@@ -177,5 +179,44 @@ describe('Common', function () {
       assert.strictEqual(result, nowEpoch);
     });
   }); // dateToEpoch
+
+  describe('omit', function () {
+    it('covers', function () {
+      const obj = {
+        foo: true,
+        bar: 'bar',
+        baz: {
+          quux: false,
+        },
+      };
+      const omitted = ['bar', 'baz'];
+      const expected = {
+        foo: true,
+      };
+      const result = common.omit(obj, omitted);
+      assert.deepStrictEqual(result, expected);
+    });
+  }); // omit
+
+  describe('mysteryBoxLogger', function () {
+    let mbl, stubLogger;
+    beforeEach(function () {
+      stubLogger = new StubLogger();
+      stubLogger._reset();
+      mbl = common.mysteryBoxLogger(stubLogger, 'test:scope');
+    });
+    afterEach(function () {
+      sinon.restore();
+    });
+    it('covers', function () {
+      const stat = {
+        packageName: 'fake-mystery-box',
+        packageVersion: '0.0.0',
+        data: 'exists',
+      };
+      mbl(stat);
+      assert(stubLogger.debug.called);
+    });
+  }); // mysteryBoxLogger
 
 }); // Common

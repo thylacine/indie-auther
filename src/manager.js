@@ -28,7 +28,8 @@ class Manager {
     if (options.queues.amqp.url) {
       this.queuePublisher = new QueuePublisher(logger, options.queues.amqp);
     }
-    this.mysteryBox = new MysteryBox(logger, options);
+    this.mysteryBox = new MysteryBox(options);
+    this.mysteryBox.on('statistics', common.mysteryBoxLogger(logger, _fileScope(this.constructor.name)));
 
     // We need to know how the outside world sees us, to verify if a
     // profile indicates us as the auth server.

@@ -151,6 +151,28 @@ const dateToEpoch = (date) => {
   return Math.ceil(dateMs / 1000);
 };
 
+
+const omit = (o, props) => {
+  return Object.fromEntries(Object.entries(o).filter(([k]) => !props.includes(k)))
+};
+
+
+/**
+ * Log Mystery Box statistics events.
+ * @param {Console} logger
+ * @param {String} scope
+ */
+const mysteryBoxLogger = (logger, scope) => {
+  return (s) => {
+    logger.debug(scope, `${s.packageName}@${s.packageVersion}:${s.method}`, omit(s, [
+      'packageName',
+      'packageVersion',
+      'method',
+    ]));
+  };
+};
+
+
 module.exports = {
   ...common,
   axiosResponseLogData,
@@ -159,7 +181,9 @@ module.exports = {
   ensureArray,
   freezeDeep,
   logTruncate,
+  mysteryBoxLogger,
   newSecret,
+  omit,
   randomBytesAsync,
   validScope,
   validError,
