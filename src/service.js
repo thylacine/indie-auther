@@ -17,12 +17,12 @@ const Enum = require('./enum');
 const _fileScope = common.fileScope(__filename);
 
 class Service extends Dingus {
-  constructor(logger, db, options) {
+  constructor(logger, db, options, asyncLocalStorage) {
     super(logger, {
       ...options.dingus,
       ignoreTrailingSlash: false,
     });
-
+    this.asyncLocalStorage = asyncLocalStorage;
     this.staticPath = path.normalize(path.join(__dirname, '..', 'static'));
     this.manager = new Manager(logger, db, options);
     this.authenticator = new Authenticator(logger, db, options);
@@ -103,6 +103,10 @@ class Service extends Dingus {
   async preHandler(req, res, ctx) {
     await super.preHandler(req, res, ctx);
     ctx.url = req.url; // Persist this for logout redirect
+
+    const logObject = this.asyncLocalStorage.getStore();
+    logObject.requestId = ctx.requestId;
+    delete ctx.requestId;
   }
 
 

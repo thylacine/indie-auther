@@ -5,6 +5,7 @@
 
 const assert = require('assert');
 const sinon = require('sinon'); // eslint-disable-line node/no-unpublished-require
+const { AsyncLocalStorage } = require('node:async_hooks');
 
 const stubDb = require('../stub-db');
 const stubLogger = require('../stub-logger');
@@ -13,12 +14,13 @@ const Config = require('../../config');
 
 
 describe('Service', function () {
-  let service, options;
+  let service, options, asyncLocalStorage;
   let req, res, ctx;
 
   beforeEach(function () {
+    asyncLocalStorage = new AsyncLocalStorage();
     options = new Config('test');
-    service = new Service(stubLogger, stubDb, options);
+    service = new Service(stubLogger, stubDb, options, asyncLocalStorage);
     sinon.stub(service.manager);
     sinon.stub(service.sessionManager);
     sinon.stub(service.authenticator);
@@ -66,11 +68,15 @@ describe('Service', function () {
     });
   }); // initialize
 
-  describe('preHandler', function () {
+  describe('preHandler', async function () {
     it('persists url into context', async function () {
       req.url = 'https://example.com/foo';
       sinon.stub(service.__proto__.__proto__, 'preHandler').resolves();
-      await service.preHandler(req, res, ctx);
+      await service.asyncLocalStorage.run({}, async () => {
+        await service.preHandler(req, res, ctx);
+        const logObject = service.asyncLocalStorage.getStore();
+        assert('requestId' in logObject);
+      });
       assert.strictEqual(ctx.url, req.url);
     });
   }); // preHandler
