@@ -1527,7 +1527,7 @@ class Manager {
       }
 
       try {
-        const result = await this.queuePublisher.publish(queueName, { ticket, resource, subject });
+        const result = await this.queuePublisher.publish(queueName, { ticket, resource, subject, epochMs: Date.now() });
         this.logger.debug(_scope, 'accepted ticket offer', { queueName, ticket, resource, subject, ctx, result });
       } catch (e) {
         this.logger.error(_scope, 'failed to publish ticket to queue', { error: e, queueName, ticket, resource, subject, ctx });
@@ -1934,7 +1934,7 @@ class Manager {
 
             try {
               const result = await this.communication.deliverTicket(ctx.ticketEndpointUrl, ctx.ticketResourceUrl, ctx.ticketSubjectUrl, ticket);
-              ctx.notifications.push(`Success! Ticket was delivered. (${result?.statusText})`);
+              ctx.notifications.push(`Success! Ticket was delivered. (${result?.statusMessage})`);
               this.logger.info(_scope, 'ticket delivered', { ctx, result });
             } catch (e) {
               this.logger.error(_scope, 'failed to deliver ticket', { ctx, error: e });

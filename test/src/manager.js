@@ -49,7 +49,7 @@ describe('Manager', function () {
     sinon.stub(manager.communication, 'fetchProfile');
     sinon.stub(manager.communication, 'fetchClientIdentifier');
     sinon.stub(manager.communication, 'deliverTicket');
-    sinon.stub(dns, 'lookupAsync').resolves([{ family: 4, address: '10.11.12.13' }]);
+    sinon.stub(dns.promises, 'lookup').resolves([{ family: 4, address: '10.11.12.13' }]);
     sinon.stub(manager.queuePublisher, 'connect');
     sinon.stub(manager.queuePublisher, 'establishAMQPPlumbing');
     sinon.stub(manager.queuePublisher, 'publish');
