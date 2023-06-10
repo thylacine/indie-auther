@@ -52,48 +52,6 @@ describe('Common', function () {
     });
   }); // freezeDeep
 
-  describe('axiosResponseLogData', function () {
-    it('covers', function () {
-      const response = {
-        status: 200,
-        statusText: 'OK',
-        headers: {
-          'Content-Type': 'text/plain',
-        },
-        otherData: 'blah',
-        data: 'Old Mother West Wind had stopped to talk with the Slender Fir Tree. "I\'ve just come across the Green Meadows," said Old Mother West Wind, “and there I saw the Best Thing in the World.”',
-      };
-      const expected = {
-        status: 200,
-        statusText: 'OK',
-        headers: {
-          'Content-Type': 'text/plain',
-        },
-        data: 'Old Mother West Wind had stopped to talk with the Slender Fir Tree. "I\'ve just come across the Green... (184 bytes)',
-      };
-      const result = common.axiosResponseLogData(response);
-      assert.deepStrictEqual(result, expected);
-    });
-    it('covers no data', function () {
-      const response = {
-        status: 200,
-        statusText: 'OK',
-        headers: {
-          'Content-Type': 'text/plain',
-        },
-      };
-      const expected = {
-        status: 200,
-        statusText: 'OK',
-        headers: {
-          'Content-Type': 'text/plain',
-        },
-      };
-      const result = common.axiosResponseLogData(response);
-      assert.deepStrictEqual(result, expected);
-    });
-  }); // axiosResponseLogData
-
   describe('logTruncate', function () {
     it('returns short string', function () {
       const str = 'this is a short string';

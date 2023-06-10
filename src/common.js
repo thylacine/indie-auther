@@ -7,25 +7,6 @@ const { promisify } = require('util');
 const randomBytesAsync = promisify(randomBytes);
 
 /**
- * Pick out useful axios response fields.
- * @param {*} res
- * @returns
- */
-const axiosResponseLogData = (res) => {
-  const data = common.pick(res, [
-    'status',
-    'statusText',
-    'headers',
-    'elapsedTimeMs',
-    'data',
-  ]);
-  if (data.data) {
-    data.data = logTruncate(data.data, 100);
-  }
-  return data;
-};
-
-/**
  * Limit length of string to keep logs sane
  * @param {String} str
  * @param {Number} len
@@ -175,7 +156,6 @@ const mysteryBoxLogger = (logger, scope) => {
 
 module.exports = {
   ...common,
-  axiosResponseLogData,
   camelfy,
   dateToEpoch,
   ensureArray,
