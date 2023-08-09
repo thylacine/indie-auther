@@ -538,7 +538,7 @@ class Service extends Dingus {
       return;
     }
 
-    super.handlerInternalServerError(req, res, ctx);
+    await super.handlerInternalServerError(req, res, ctx);
   }
 
 

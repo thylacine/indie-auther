@@ -187,21 +187,27 @@ describe('Service', function () {
   }); // handlerGetHealthcheck
 
   describe('handlerInternalServerError', function () {
+    let ServiceClass, DingusClass;
+    before(function () {
+      ServiceClass = Object.getPrototypeOf(service);
+      DingusClass = Object.getPrototypeOf(ServiceClass);
+    });
     it('covers no redirect', async function () {
-      sinon.stub(service.__proto__.__proto__, 'handlerInternalServerError');
+      sinon.stub(DingusClass, 'handlerInternalServerError');
       await service.handlerInternalServerError(req, res, ctx);
-      assert(service.__proto__.__proto__.handlerInternalServerError.called);
+      assert(DingusClass.handlerInternalServerError.called);
     });
     it('covers redirect', async function () {
-      sinon.stub(service.__proto__.__proto__, 'handlerInternalServerError');
+      sinon.stub(DingusClass, 'handlerInternalServerError');
       ctx.session = {
         redirectUri: new URL('https://client.example.com/app'),
         clientIdentifier: new URL('https://client.exmaple.com/'),
         state: '123456',
       };
       await service.handlerInternalServerError(req, res, ctx);
-      assert(!service.__proto__.__proto__.handlerInternalServerError.called);
-      assert(res.setHeader);
+      assert(!DingusClass.handlerInternalServerError.called);
+      assert(res.setHeader.called);
+      assert.strictEqual(res.statusCode, 302);
     });
   }); // handlerInternalServerError
 
