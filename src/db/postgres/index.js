@@ -7,7 +7,7 @@ const pgpInitOptions = {
 
 const path = require('path');
 const pgp = require('pg-promise')(pgpInitOptions);
-const svh = require('../schema-version-helper');
+const { unappliedSchemaVersions } = require('../schema-version-helper');
 const Database = require('../abstract');
 const DBErrors = require('../errors');
 const common = require('../../common');
@@ -15,10 +15,10 @@ const common = require('../../common');
 const _fileScope = common.fileScope(__filename);
 
 const PGTypeIdINT8 = 20; // Type Id 20 == INT8 (BIGINT)
-const PGTYpeIdINT8Array = 1016; //Type Id 1016 == INT8[] (BIGINT[])
+const PGTypeIdINT8Array = 1016; //Type Id 1016 == INT8[] (BIGINT[])
 pgp.pg.types.setTypeParser(PGTypeIdINT8, BigInt); // Type Id 20 = INT8 (BIGINT)
-const parseBigIntArray = pgp.pg.types.getTypeParser(PGTYpeIdINT8Array); // Type Id 1016 = INT8[] (BIGINT[])
-pgp.pg.types.setTypeParser(PGTYpeIdINT8Array, (a) => parseBigIntArray(a).map(BigInt));
+const parseBigIntArray = pgp.pg.types.getTypeParser(PGTypeIdINT8Array); // Type Id 1016 = INT8[] (BIGINT[])
+pgp.pg.types.setTypeParser(PGTypeIdINT8Array, (a) => parseBigIntArray(a).map(BigInt));
 
 const schemaVersionsSupported = {
   min: {
@@ -142,7 +142,7 @@ class DatabasePostgres extends Database {
 
     // Apply migrations
     const currentSchema = await this._currentSchema();
-    const migrationsWanted = svh.unappliedSchemaVersions(__dirname, currentSchema, this.schemaVersionsSupported);
+    const migrationsWanted = unappliedSchemaVersions(__dirname, currentSchema, this.schemaVersionsSupported);
     this.logger.debug(_scope, 'schema migrations wanted', { migrationsWanted });
     for (const v of migrationsWanted) {
       const fPath = path.join(__dirname, 'sql', 'schema', v, 'apply.sql');

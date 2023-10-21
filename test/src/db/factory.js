@@ -3,7 +3,7 @@
 
 const assert = require('assert');
 const sinon = require('sinon'); // eslint-disable-line node/no-unpublished-require
-const common = require('../../../src/common');
+const Logger = require('@squeep/logger-json-console');
 const DB = require('../../../src/db');
 const DBErrors = require('../../../src/db/errors');
 const DatabasePostgres = require('../../../src/db/postgres');
@@ -12,7 +12,7 @@ const DatabaseSQLite = require('../../../src/db/sqlite');
 describe('DatabaseFactory', function () {
   let logger, options;
   beforeEach(function () {
-    logger = common.nullLogger;
+    logger = Logger.nullLogger;
     options = {
       db: {
         connectionString: '',

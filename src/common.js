@@ -154,6 +154,8 @@ const mysteryBoxLogger = (logger, scope) => {
 };
 
 
+const nop = () => { /**/ };
+
 module.exports = {
   ...common,
   camelfy,
@@ -167,5 +169,6 @@ module.exports = {
   randomBytesAsync,
   validScope,
   validError,
+  nop,
 };
 

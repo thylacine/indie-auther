@@ -41,7 +41,8 @@ describe('DatabaseBase', function () {
     }); // covers abstract methods
     it('covers private abstract methods', async function () {
       [
-      ].map((m) => {
+        '_currentSchema',
+      ].forEach((m) => {
         try {
           // eslint-disable-next-line security/detect-object-injection
           db[m]();
@@ -52,36 +53,6 @@ describe('DatabaseBase', function () {
     });
   }); // Interface
 
-  describe('_isUUID', function () {
-    it('is a uuid', function () {
-      const result = DB._isUUID('8fde351e-2d63-11ed-8b0c-0025905f714a');
-      assert.strictEqual(result, true);
-    });
-    it('is not a uuid', function () {
-      const result = DB._isUUID('not a uuid');
-      assert.strictEqual(result, false);
-    });
-  });
-
-  describe('_isInfinites', function () {
-    it('is true for Infinity', function () {
-      const result = DB._isInfinites(Infinity);
-      assert.strictEqual(result, true);
-    });
-    it('is true for negative Infinity', function () {
-      const result = DB._isInfinites(-Infinity);
-      assert.strictEqual(result, true);
-    });
-    it('is false for finite value', function () {
-      const result = DB._isInfinites(5);
-      assert.strictEqual(result, false);
-    });
-    it('is false for NaN', function () {
-      const result = DB._isInfinites(NaN);
-      assert.strictEqual(result, false);
-    });
-  });
-
   describe('_ensureTypes', function () {
     let object;
     beforeEach(function () {
@@ -90,6 +61,8 @@ describe('DatabaseBase', function () {
         bignum: BigInt(456),
         buf: Buffer.from('foop'),
         date: new Date(),
+        infP: Infinity,
+        infN: -Infinity,
         num: 123,
         obj: {},
         str: 'some words',
@@ -99,18 +72,15 @@ describe('DatabaseBase', function () {
     });
     it('succeeds', function () {
       db._ensureTypes(object, ['array'], ['array']);
+      db._ensureTypes(object, ['bignum'], ['bigint']);
       db._ensureTypes(object, ['bignum', 'num'], ['number']);
       db._ensureTypes(object, ['buf'], ['buffer']);
       db._ensureTypes(object, ['date'], ['date']);
+      db._ensureTypes(object, ['infP', 'infN'], ['infinites']);
       db._ensureTypes(object, ['str', 'veryNull'], ['string', 'null']);
     });
     it('data failure', function () {
-      try {
-        db._ensureTypes(object, ['missingField'], ['string', 'null']);
-        assert.fail('validation should have failed');
-      } catch (e) {
-        assert(e instanceof DBErrors.DataValidation);
-      }
+      assert.throws(() => db._ensureTypes(object, ['missingField'], ['string', 'null']), DBErrors.DataValidation);
     });
     it('failure covers singular', function () {
       try {
@@ -128,6 +98,9 @@ describe('DatabaseBase', function () {
         assert(e instanceof DBErrors.DataValidation);
       }
     });
+    it('covers unknown type', function () {
+      assert.throws(() => db._ensureTypes(object, ['field'], ['not a type']));
+    });
   }); // _ensureTypes
 
   describe('_validateAuthentication', function () {
@@ -137,7 +110,7 @@ describe('DatabaseBase', function () {
         identifier: 'username',
         credential: '$plain$secret',
         created: new Date(),
-        lastAuthenticated: -Infinity,
+        lastAuthentication: -Infinity,
       };
     });
     it('covers', function () {

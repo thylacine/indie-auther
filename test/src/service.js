@@ -7,19 +7,23 @@ const assert = require('assert');
 const sinon = require('sinon'); // eslint-disable-line node/no-unpublished-require
 const { AsyncLocalStorage } = require('node:async_hooks');
 
-const stubDb = require('../stub-db');
-const stubLogger = require('../stub-logger');
+const StubDb = require('../stub-db');
+const StubLogger = require('../stub-logger');
 const Service = require('../../src/service');
 const Config = require('../../config');
 
 
 describe('Service', function () {
-  let service, options, asyncLocalStorage;
+  let service, stubLogger, stubDb, options, asyncLocalStorage;
   let req, res, ctx;
 
   beforeEach(function () {
     asyncLocalStorage = new AsyncLocalStorage();
     options = new Config('test');
+    stubDb = new StubDb();
+    stubDb._reset();
+    stubLogger = new StubLogger();
+    stubLogger._reset();
     service = new Service(stubLogger, stubDb, options, asyncLocalStorage);
     sinon.stub(service.manager);
     sinon.stub(service.sessionManager);

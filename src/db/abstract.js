@@ -39,12 +39,15 @@ class Database {
 
 
   /**
+   * @typedef {Object} SchemaVersionObject
+   * @property {Number} major
+   * @property {Number} minor
+   * @property {Number} patch
+   */
+  /**
    * Query the current schema version.
    * This is a standalone query function, as it is called before statements are loaded.
-   * @returns {Object} version
-   * @returns {Number} version.major
-   * @returns {Number} version.minor
-   * @returns {Number} version.patch
+   * @returns {SchemaVersionObject}
    */
   async _currentSchema() {
     this._notImplemented('_currentSchema', arguments);
@@ -79,30 +82,25 @@ class Database {
 
 
   /**
-   * @param {*} x
-   * @returns {Boolean}
-   */
-  static _isUUID(x) {
-    try {
-      uuid.parse(x);
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }
-
-
-  /**
-   * @param {*} x
-   * @returns {Boolean}
-   */
-  static _isInfinites(x) {
-    return typeof(x) === 'number'
-      && Math.abs(x) === Infinity;
-  }
-
-  /**
    * Basic type checking of object properties.
+   *
+   * Types may be any of the built-in types:
+   * - boolean
+   * - bigint (also allowed with 'number')
+   * - function
+   * - number (this will also allow 'bigint')
+   * - object
+   * - string
+   * - symbol
+   * - undefined
+   *
+   * Types may also be any of the following:
+   * - array
+   * - buffer
+   * - date
+   * - infinites
+   * - null
+   * - uuid
    * @param {Object} object
    * @param {String[]} properties
    * @param {String[]} types
@@ -114,6 +112,30 @@ class Database {
       this.logger.error(_scope, 'undefined argument', { object, properties, types });
       throw new DatabaseErrors.DataValidation();
     }
+
+    const supportedTypes = [
+      'array',
+      'bigint',
+      'boolean',
+      'buffer',
+      'date',
+      'function',
+      'infinites',
+      'null',
+      'number',
+      'object',
+      'string',
+      'symbol',
+      'undefined',
+      'uuid',
+    ];
+    types.forEach((t) => {
+      if (!supportedTypes.includes(t)) {
+        this.logger.error(_scope, 'unsupported type', { object, properties, types, unsupportedType: t });
+        throw new DatabaseErrors.DataValidation();
+      }
+    });
+
     properties.forEach((p) => {
       // eslint-disable-next-line security/detect-object-injection
       const pObj = object[p];
@@ -122,10 +144,10 @@ class Database {
       &&  !(types.includes('array') && Array.isArray(pObj))
       &&  !(types.includes('buffer') && pObj instanceof Buffer)
       &&  !(types.includes('date') && pObj instanceof Date)
-      &&  !(types.includes('infinites'))
+      &&  !(types.includes('infinites') && Math.abs(pObj) === Infinity)
       &&  !(types.includes('null') && pObj === null)
       &&  !(types.includes('number') && pType === 'bigint')
-      &&  !(types.includes('uuid') && Database._isUUID(pObj))) {
+      &&  !(types.includes('uuid') && uuid.validate(pObj))) {
         const reason = `'${p}' is '${pType}', but must be ${types.length > 1 ? 'one of ' : ''}'${types}'`;
         this.logger.error(_scope, reason, {});
         throw new DatabaseErrors.DataValidation(reason);
@@ -139,7 +161,7 @@ class Database {
    * @property {String} identifier
    * @property {String=} credential
    * @property {Date} created
-   * @property {Date=} lastAuthenticated
+   * @property {Date=} lastAuthentication
    */
   /**
    * @param {Authentication} authentication 
@@ -149,7 +171,7 @@ class Database {
       [['identifier'], ['string']],
       [['credential'], ['string', 'null']],
       [['created'], ['date']],
-      [['lastAuthenticated'], ['date', 'infinites']],
+      [['lastAuthentication'], ['date', 'infinites']],
     ].forEach(([properties, types]) => this._ensureTypes(authentication, properties, types));
   }
 

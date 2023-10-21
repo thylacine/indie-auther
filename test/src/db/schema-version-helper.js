@@ -137,7 +137,7 @@ describe('SchemaVersionHelper', function () {
         max: { major: 1, minor: 1, patch: 1 },
       };
       current = { major: 1, minor: 0, patch: 1 };
-      });
+    });
     it('covers', function () {
       const expected = ['1.1.0', '1.1.1'];
       fs.readdirSync.returns(['1.1.2', 'file.txt', '1.1.0', '1.1.1', 'init.sql', '1.0.1', '1.0.0']);

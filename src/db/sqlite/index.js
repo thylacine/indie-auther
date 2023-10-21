@@ -3,7 +3,7 @@
 const common = require('../../common');
 const Database = require('../abstract');
 const DBErrors = require('../errors');
-const svh = require('../schema-version-helper');
+const { unappliedSchemaVersions } = require('../schema-version-helper');
 const SQLite = require('better-sqlite3');
 const fs = require('fs');
 const path = require('path');
@@ -96,7 +96,7 @@ class DatabaseSQLite extends Database {
 
     // Apply migrations
     const currentSchema = this._currentSchema();
-    const migrationsWanted = svh.unappliedSchemaVersions(__dirname, currentSchema, this.schemaVersionsSupported);
+    const migrationsWanted = unappliedSchemaVersions(__dirname, currentSchema, this.schemaVersionsSupported);
     this.logger.debug(_scope, 'schema migrations wanted', { migrationsWanted });
     migrationsWanted.forEach((v) => {
       const fPath = path.join(__dirname, 'sql', 'schema', v, 'apply.sql');
