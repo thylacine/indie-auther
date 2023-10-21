@@ -2,6 +2,11 @@
 
 Releases and notable changes to this project are documented here.
 
+## [v1.0.3] - 2023-10-21
+
+- Updated dependencies.
+- Minor cleanup and changes for dependency updates.
+
 ## [v1.0.2] - 2023-06-10
 
 ### Changed
@@ -22,7 +27,8 @@ Releases and notable changes to this project are documented here.
 
 ---
 
-[Unreleased]: https://git.squeep.com/?p=squeep-indie-auther;a=commitdiff;h=HEAD;hp=v1.0.2
+[Unreleased]: https://git.squeep.com/?p=squeep-indie-auther;a=commitdiff;h=HEAD;hp=v1.0.3
+[v1.0.3]: https://git.squeep.com/?p=squeep-indie-auther;a=commitdiff;h=v1.0.3;hp=v1.0.2
 [v1.0.2]: https://git.squeep.com/?p=squeep-indie-auther;a=commitdiff;h=v1.0.2;hp=v1.0.1
 [v1.0.1]: https://git.squeep.com/?p=squeep-indie-auther;a=commitdiff;h=v1.0.1;hp=v1.0.0
 [v1.0.0]: https://git.squeep.com/?p=squeep-indie-auther;a=commitdiff;h=v1.0.0;hp=v0.0.0
