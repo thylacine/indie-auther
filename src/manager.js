@@ -1197,7 +1197,7 @@ class Manager {
     const nowEpoch = common.dateToEpoch();
     return this.mysteryBox.pack({
       c: common.requestId(),
-      iss: nowEpoch,
+      iat: nowEpoch,
       exp: nowEpoch + ticketLifespanSeconds,
       sub: subject,
       res: resource,
@@ -1228,7 +1228,7 @@ class Manager {
     const ticketObj = await this.mysteryBox.unpack(ticket);
     return {
       codeId: ticketObj.c,
-      issued: new Date(ticketObj.iss * 1000),
+      issued: new Date(ticketObj.iat * 1000),
       expires: new Date(ticketObj.exp * 1000),
       subject: new URL(ticketObj.sub),
       resource: new URL(ticketObj.res),
