@@ -8,6 +8,7 @@ class StubDatabase extends Base {
     return [
       ...super._stubFns,
       'almanacGetAll',
+      'almanacUpsert',
       'authenticationGet',
       'authenticationSuccess',
       'authenticationUpsert',
@@ -27,7 +28,10 @@ class StubDatabase extends Base {
       'tokenGetByCodeId',
       'tokenRefreshRevokeByCodeId',
       'tokenRevokeByCodeId',
-      'tokensGetByIdentifier',    
+      'tokensGetByIdentifier',
+      'ticketRedeemed',
+      'ticketTokenPublished',
+      'ticketTokenGetUnpublished',
     ];
   }
 }

@@ -7,7 +7,7 @@
   "extends": [
     "eslint:recommended",
     "plugin:node/recommended",
-    "plugin:security/recommended",
+    "plugin:security/recommended-legacy",
     "plugin:sonarjs/recommended"
   ],
   "parserOptions": {

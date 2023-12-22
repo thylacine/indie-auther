@@ -101,12 +101,19 @@ class Service extends Dingus {
    * @param {Object} ctx
    */
   async preHandler(req, res, ctx) {
+    const _scope = _fileScope('preHandler');
+
     await super.preHandler(req, res, ctx);
     ctx.url = req.url; // Persist this for logout redirect
 
     const logObject = this.asyncLocalStorage.getStore();
-    logObject.requestId = ctx.requestId;
-    delete ctx.requestId;
+    // istanbul ignore else
+    if (logObject) { // debugging in vscode seems to kill ALS, work around
+      logObject.requestId = ctx.requestId;
+      delete ctx.requestId;
+    } else {
+      this.logger.debug(_scope, 'no async local store');
+    }
   }
 
 

@@ -12,15 +12,12 @@ A ```user``` is an entity known to this service, with a credential (currently a 
 Authentication of a ```user``` is handled by either a [hashed password](https://en.wikipedia.org/wiki/Argon2) stored securely in one of the available database engines, or by optionally delegating to the host machine's [<abbr title="Pluggable Authentication Module">PAM</abbr> subsystem](https://en.wikipedia.org/wiki/Pluggable_Authentication_Modules).
 PAM can be used to leverage, exempli gratia, LDAP integration for user authentication.
 
-A ```profile``` is a URL (under control of a ```user```) which contents includes the necessary meta-data informing an application to contact this server for identification validation.  Each ```user``` may have one or more ```profile```s.
+A ```profile``` is a URL (under control of a ```user```) which contents includes the necessary meta-data informing an application to contact this service for identification validation.  Each ```user``` may have one or more ```profile```s.
 
 Each ```profile``` may also be associated with a customizable list of additional [scopes](https://www.oauth.com/oauth2-servers/scope/) which may be added to any application client grant for convenience.
 
 An example of the user-interface when granting consent to a client application:
 ![Consent page](./documentation/media/consent-page.png)
-
-A rudimentary ticket-sending UI is also available:
-![Ticket Offer page](./documentation/media/ticket-page.png)
 
 ## Resource Service Integration
 
@@ -28,7 +25,12 @@ Other services (resources) may make calls to validate token grants by configurin
 
 ## Ticket Auth
 
-This service can accept proffered [authentication tickets](https://indieweb.org/IndieAuth_Ticket_Auth).  It will simply publish any proffered tickets for valid profiles to a configured AMQP/RabbitMQ queue for some other service to redeem and make use of.
+This service can accept proffered [authentication tickets](https://indieweb.org/IndieAuth_Ticket_Auth).  It will attempt to redeem any proffered tickets, then publish the resulting tokens to a configured AMQP/RabbitMQ queue for other services to make use of.  If no AMQP server is configured, the ticket endpoint will be disabled and not advertised.
+
+Ensure the output of the script `bin/ticket-queue-profile.js` is executed on RabbitMQ server to install the needed queue profile.
+
+A rudimentary ticket-sending UI is also available:
+![Ticket Offer page](./documentation/media/ticket-page.png)
 
 ## Architecture
 

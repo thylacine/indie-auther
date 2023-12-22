@@ -102,7 +102,7 @@ function tokenTable(tokens) {
 \t<thead>
 \t\t<tr>
 <th>Type</th>
-\t\t\t<th>Client Identifier</th>
+\t\t\t<th>Client Identifier / Ticket Subject</th>
 \t\t\t<th>Profile</th>
 <th>Scopes</th>
 \t\t\t<th>Code</th>

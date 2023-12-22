@@ -10,7 +10,7 @@ module.exports = {
   },
   queues: {
     amqp: {
-      url: 'ampq://localhost:5432',
+      url: 'amqp://localhost:5432',
     },
   },
 };

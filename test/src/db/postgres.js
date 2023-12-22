@@ -314,6 +314,42 @@ describe('DatabasePostgres', function () {
     });
   }); // almanacGetAll
 
+  describe('almanacUpsert', function () {
+    let event, date;
+    beforeEach(function () {
+      event = 'test_event';
+      date = new Date('Fri Dec 22 03:27 UTC 2023')
+    });
+    it('success', async function () {
+      const dbResult = {
+        rowCount: 1,
+        rows: undefined,
+        duration: 22,
+      };
+      sinon.stub(db.db, 'result').resolves(dbResult);
+      await db.almanacUpsert(dbCtx, event, date);
+    });
+    it('success with default date', async function () {
+      const dbResult = {
+        rowCount: 1,
+        rows: undefined,
+        duration: 22,
+      };
+      sinon.stub(db.db, 'result').resolves(dbResult);
+      await db.almanacUpsert(dbCtx, event);
+    });
+    it('failure', async function () {
+      const dbResult = {
+        rowCount: 0,
+        rows: undefined,
+        duration: 22,
+      };
+      sinon.stub(db.db, 'result').resolves(dbResult);
+      await assert.rejects(() => db.almanacUpsert(dbCtx, event, date), DBErrors.UnexpectedResult);
+    });
+  }); // almanacUpsert
+
+
   describe('authenticationSuccess', function () {
     let identifier;
     beforeEach(function () {
@@ -949,5 +985,101 @@ describe('DatabasePostgres', function () {
     });
   }); // tokensGetByIdentifier
 
+  describe('ticketRedeemed', function () {
+    let redeemedData;
+    beforeEach(function () {
+      redeemedData = {
+        resource: 'https://resource.example.com/',
+        subject: 'https://subject.example.com/',
+        iss: 'https://idp.example.com/',
+        ticket: 'xxxTICKETxxx',
+        token: 'xxxTOKENxxx',
+      };
+    });
+    it('success', async function () {
+      const dbResult = {
+        rowCount: 1,
+        rows: undefined,
+        duration: 22,
+      };
+      sinon.stub(db.db, 'result').resolves(dbResult);
+      await db.ticketRedeemed(dbCtx, redeemedData);
+    });
+    it('failure', async function () {
+      const dbResult = {
+        rowCount: 0,
+        rows: undefined,
+        duration: 22,
+      };
+      sinon.stub(db.db, 'result').resolves(dbResult);
+      await assert.rejects(() => db.ticketRedeemed(dbCtx, redeemedData), DBErrors.UnexpectedResult);
+    });
+  }); // ticketRedeemed
+
+  describe('ticketTokenPublished', function () {
+    let redeemedData;
+    beforeEach(function () {
+      redeemedData = {
+        resource: 'https://resource.example.com/',
+        subject: 'https://subject.example.com/',
+        iss: 'https://idp.example.com/',
+        ticket: 'xxxTICKETxxx',
+        token: 'xxxTOKENxxx',
+      };
+      sinon.stub(db.db, 'result');
+    });
+    it('success', async function () {
+      const dbResult = {
+        rowCount: 1,
+        rows: undefined,
+        duration: 22,
+      };
+      db.db.result.resolves(dbResult);
+      await db.ticketTokenPublished(dbCtx, redeemedData);
+    });
+    it('failure', async function () {
+      const dbResult = {
+        rowCount: 0,
+        rows: undefined,
+        duration: 22,
+      };
+      db.db.result.resolves(dbResult);
+      await assert.rejects(() => db.ticketTokenPublished(dbCtx, redeemedData), DBErrors.UnexpectedResult);
+    });
+    it('failure of almanac', async function () {
+      const dbResult = {
+        rowCount: 1,
+        rows: undefined,
+        duration: 22,
+      };
+      const dbResultAlmanac = {
+        ...dbResult,
+        rowCount: 0,
+      };
+      db.db.result.resolves(dbResult).onCall(1).resolves(dbResultAlmanac);
+      await assert.rejects(() => db.ticketTokenPublished(dbCtx, redeemedData), DBErrors.UnexpectedResult);
+    });
+  }); // ticketTokenPublished
+
+  describe('ticketTokenGetUnpublished', function () {
+    it('success', async function () {
+      const expected = [{
+        resource: 'https://resource.example.com/',
+        subject: 'https://subject.example.com/',
+        iss: 'https://idp.example.com/',
+        ticket: 'xxxTICKETxxx',
+        token: 'xxxTOKENxxx',
+        created: new Date(),
+        published: null,
+      }];
+      sinon.stub(db.db, 'manyOrNone').resolves(expected);
+      const result = await db.ticketTokenGetUnpublished(dbCtx);
+      assert.deepStrictEqual(result, expected);
+    });
+    it('failure', async function () {
+      sinon.stub(db.db, 'manyOrNone').rejects(expectedException);
+      await assert.rejects(() => db.ticketTokenGetUnpublished(dbCtx), expectedException);
+    });
+  }); // ticketTokenGetUnpublished
 
 }); // DatabasePostgres

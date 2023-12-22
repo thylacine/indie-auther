@@ -10,13 +10,15 @@ const _fileScope = common.fileScope(__filename);
  */
 
 class Chores extends BaseChores {
-  constructor(logger, db, options) {
+  constructor(logger, db, queuePublisher, options) {
     super(logger);
     this.options = options;
     this.db = db;
+    this.queuePublisher = queuePublisher;
 
     this.establishChore(Enum.Chore.CleanTokens, this.cleanTokens.bind(this), options?.chores?.tokenCleanupMs);
     this.establishChore(Enum.Chore.CleanScopes, this.cleanScopes.bind(this), options?.chores?.scopeCleanupMs);
+    this.establishChore(Enum.Chore.PublishTickets, this.publishTickets.bind(this), options?.chores?.publishTicketsMs);
   }
 
   /**
@@ -25,7 +27,7 @@ class Chores extends BaseChores {
    */
   async cleanTokens(atLeastMsSinceLast = this.options?.chores?.tokenCleanupMs || 0) {
     const _scope = _fileScope('cleanTokens');
-    this.logger.debug(_scope, 'called', atLeastMsSinceLast);
+    this.logger.debug(_scope, 'called', { atLeastMsSinceLast });
 
     let tokensCleaned;
     try {
@@ -49,7 +51,7 @@ class Chores extends BaseChores {
    */
   async cleanScopes(atLeastMsSinceLast = this.options?.chores?.scopeCleanupMs || 0) {
     const _scope = _fileScope('cleanScopes');
-    this.logger.debug(_scope, 'called', atLeastMsSinceLast);
+    this.logger.debug(_scope, 'called', { atLeastMsSinceLast });
 
     let scopesCleaned;
     try {
@@ -65,6 +67,34 @@ class Chores extends BaseChores {
     }
   }
 
-} // IAChores
+
+  /**
+   * Attempt to deliver any redeemed but un-delivered ticket tokens.
+   */
+  async publishTickets() {
+    const _scope = _fileScope('publishTickets');
+    this.logger.debug(_scope, 'called');
+
+    try {
+      const queueName = this.options.queues.ticketRedeemedName;
+      await this.db.context(async (dbCtx) => {
+        const ticketTokens = await this.db.ticketTokenGetUnpublished(dbCtx);
+        for await (const data of ticketTokens) {
+          try {
+            const result = await this.queuePublisher.publish(queueName, data);
+            this.logger.info(_scope, 'published ticket token', { queueName, result, ...data });
+            const redeemedData = common.pick(data, ['resource', 'subject', 'iss', 'ticket', 'token']);
+            await this.db.ticketTokenPublished(dbCtx, redeemedData);
+          } catch (e) {
+            this.logger.error(_scope, 'publish failed', { error: e, data });
+          }
+        }
+      }); // dbCtx
+    } catch (e) {
+      this.logger.error(_scope, 'failed', { error: e });
+      throw e;
+    }
+  }
+} // Chores
 
 module.exports = Chores;

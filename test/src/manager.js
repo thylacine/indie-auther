@@ -49,10 +49,14 @@ describe('Manager', function () {
     sinon.stub(manager.communication, 'fetchProfile');
     sinon.stub(manager.communication, 'fetchClientIdentifier');
     sinon.stub(manager.communication, 'deliverTicket');
+    sinon.stub(manager.communication, 'redeemTicket');
     sinon.stub(dns.promises, 'lookup').resolves([{ family: 4, address: '10.11.12.13' }]);
     sinon.stub(manager.queuePublisher, 'connect');
     sinon.stub(manager.queuePublisher, 'establishAMQPPlumbing');
     sinon.stub(manager.queuePublisher, 'publish');
+    sinon.stub(manager.queueConsumer, 'connect');
+    sinon.stub(manager.queueConsumer, 'establishAMQPPlumbing');
+    sinon.stub(manager.queueConsumer, 'consume');
   });
 
   afterEach(function () {
@@ -425,7 +429,8 @@ describe('Manager', function () {
       assert.strictEqual(res.statusCode, 302);
       assert.strictEqual(ctx.session.error, 'invalid_request');
       assert.strictEqual(ctx.session.errorDescriptions.length, 1);
-    });  }); // getAuthorization
+    });
+  }); // getAuthorization
 
   describe('_setError', function () {
     it('covers', function () {
@@ -2276,6 +2281,7 @@ describe('Manager', function () {
         ticket: 'ticket123',
         resource: 'https://blog.example.com/',
         subject: 'https://otheruser.example.com/',
+        iss: 'https://ia.example.com/',
       };
     });
     it('accepts a ticket for a known profile', async function () {
@@ -2300,11 +2306,80 @@ describe('Manager', function () {
     it('covers no ticket queue', async function () {
       delete options.queues.amqp.url;
       manager = new Manager(logger, stubDb, options);
-
       await assert.rejects(() => manager.postTicket(req, res, ctx), ResponseError);
+    });
+    it('covers no issuer', async function () {
+      delete ctx.parsedBody.iss;
+      manager.db.profileIsValid.resolves(true);
+      await manager.postTicket(req, res, ctx);
+      assert(res.end.called);
+      assert.strictEqual(res.statusCode, 202);
+    });
+    it('covers bad issuer', async function () {
+      ctx.parsedBody.iss = 'not a url';
+      manager.db.profileIsValid.resolves(true);
+      await manager.postTicket(req, res, ctx);
+      assert(res.end.called);
+      assert.strictEqual(res.statusCode, 202);
     });
 
   }); // postTicket
+
+  describe('queuedTicketProcessor', function () {
+    let channel, content;
+    const message = () => ({
+      content: Buffer.from(JSON.stringify(content)),
+    });
+    beforeEach(function () {
+      channel = {
+        ack: sinon.stub(),
+      };
+      content = {
+        ticket: 'XXXticketXXX',
+        resource: 'https://blog.example.com/',
+        subject: 'https://otheruser.exmaple.com/',
+        iss: 'https://ia.example.com/',
+        epochMs: Date.now(),
+      };
+    });
+    it('redeems a ticket', async function () {
+      await manager.queuedTicketProcessor(channel, message());
+      assert(manager.queuePublisher.publish.called);
+      assert(channel.ack.called);
+    });
+    it('redeems a ticket, missing issuer', async function () {
+      delete content.iss;
+      await manager.queuedTicketProcessor(channel, message());
+      assert(manager.queuePublisher.publish.called);
+      assert(channel.ack.called);
+    });
+    it('covers bad message', async function () {
+      await manager.queuedTicketProcessor(channel, { content: 'diddly' });
+      assert(channel.ack.called);
+    });
+    it('covers bad issuer', async function () {
+      content.iss = 'not a url';
+      await manager.queuedTicketProcessor(channel, message());
+      assert(manager.queuePublisher.publish.called);
+    });
+    it('covers bad resource', async function () {
+      content.resource = 'not a url';
+      await manager.queuedTicketProcessor(channel, message());
+      assert(manager.communication.redeemTicket.notCalled);
+      assert(manager.queuePublisher.publish.notCalled);
+      assert(channel.ack.called);
+    });
+    it('covers failed redemption', async function () {
+      const expectedException = new Error('oh no');
+      manager.communication.redeemTicket.rejects(expectedException);
+      assert.rejects(() => manager.queuedTicketProcessor(channel, message()), expectedException);
+    });
+    it('covers failed publish', async function () {
+      const expectedException = new Error('oh no');
+      manager.queuePublisher.publish.rejects(expectedException);
+      assert.rejects(() => manager.queuedTicketProcessor(channel, message()), expectedException);
+    });
+  }); // queuedTicketProcessor
 
   describe('getAdminMaintenance', function () {
     it('covers information', async function () {

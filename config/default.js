@@ -52,9 +52,10 @@ const defaultOptions = {
   queues: {
     amqp: {
       url: undefined, // AMQP endpoint, e.g. 'amqp://user:pass@rmq.host:5672'  If not specified, ticket endpoint will be disabled
-      prefix: undefined,
+      prefix: 'indieauth',
     },
-    ticketPublishName: 'indieauth.ticket.proffered', // exchange to publish proffered tickets to
+    ticketPublishName: 'ticket.proffered', // exchange to publish proffered tickets to
+    ticketRedeemedName: 'ticket.redeemed', // exchange to publish redeemed ticket tokens to
   },
 
   // Logging options
@@ -77,6 +78,7 @@ const defaultOptions = {
   chores: {
     scopeCleanupMs: 0, // how often to clean up unreferenced scopes, 0 for never
     tokenCleanupMs: 0, // how often to clean up no-longer-valid scopes, 0 for never
+    publishTicketsMs: 0, // how often to try to re-publish unpublished redeemed ticket tokens
   },
 
   // Outgoing request UA header. Setting these here to override helper defaults.

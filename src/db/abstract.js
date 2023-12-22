@@ -47,7 +47,7 @@ class Database {
   /**
    * Query the current schema version.
    * This is a standalone query function, as it is called before statements are loaded.
-   * @returns {SchemaVersionObject}
+   * @returns {Promise<SchemaVersionObject>}
    */
   async _currentSchema() {
     this._notImplemented('_currentSchema', arguments);
@@ -248,6 +248,17 @@ class Database {
    */
   async almanacGetAll(dbCtx) {
     this._notImplemented('almanacGetAll', arguments);
+  }
+
+
+  /**
+   * Insert or update an almanac entry.
+   * @param {*} dbCtx
+   * @param {String} event
+   * @param {Date=} date
+   */
+  async almanacUpsert(dbCtx, event, date) {
+    this._notImplemented('almanacUpsert', arguments);
   }
 
 
@@ -578,6 +589,44 @@ class Database {
    */
   async tokensGetByIdentifier(dbCtx, identifier) {
     this._notImplemented('tokensGetByIdentifier', arguments);
+  }
+
+
+  /** @typedef {Object} RedeemedTicketData
+   * @property {String} subject
+   * @property {String} resource
+   * @property {String=} iss
+   * @property {String} ticket
+   * @property {String} token
+   */
+  /**
+   * Persist details of a redeemed ticket.
+   * @param {*} dbCtx
+   * @param {RedeemedTicketData} redeemedData
+   * @returns {Promise<void>}
+   */
+  async ticketRedeemed(dbCtx, redeemedData) {
+    this._notImplemented('ticketRedeemed', arguments);
+  }
+
+
+  /**
+   * Update details of a redeemed ticket that it has been published.
+   * @param {*} dbCtx
+   * @param {RedeemedTicketData} redeemedData
+   * @returns {Promise<void>}
+   */
+  async ticketTokenPublished(dbCtx, redeemedData) {
+    this._notImplemented('ticketTokenPublished', arguments);
+  }
+
+  /**
+   * Retrieve redeemed tokens which have not yet been published to queue.
+   * @param {Number} limit
+   * @returns {Promise<RedeemedData[]>}
+   */
+  async ticketTokenGetUnpublished(dbCtx, limit) {
+    this._notImplemented('ticketTokenGetUnpublished', arguments);
   }
 
 }

@@ -21,6 +21,13 @@ common.mergeEnum(Enum, {
   Chore: {
     CleanTokens: 'cleanTokens',
     CleanScopes: 'cleanScopes',
+    PublishTickets: 'publishTickets',
+  },
+
+  AlmanacEntry: {
+    TokenCleanup: 'tokenCleanup',
+    ScopeCleanup: 'scopeCleanup',
+    TicketPublished: 'ticketPublished',
   },
 });
 

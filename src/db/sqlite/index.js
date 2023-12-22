@@ -1,6 +1,7 @@
 'use strict';
 
 const common = require('../../common');
+const Enum = require('../../enum');
 const Database = require('../abstract');
 const DBErrors = require('../errors');
 const { unappliedSchemaVersions } = require('../schema-version-helper');
@@ -20,7 +21,7 @@ const schemaVersionsSupported = {
   },
   max: {
     major: 1,
-    minor: 0,
+    minor: 1,
     patch: 0,
   },
 };
@@ -233,10 +234,13 @@ class DatabaseSQLite extends Database {
   _purgeTables(really) {
     if (really) {
       [
+        'almanac',
         'authentication',
         'profile',
+        'redeemed_ticket',
+        'resource',
         'token',
-      ].map((table) => {
+      ].forEach((table) => {
         const result = this.db.prepare(`DELETE FROM ${table}`).run();
         this.logger.debug(_fileScope('_purgeTables'), 'success', { table, result });
       });
@@ -262,6 +266,7 @@ class DatabaseSQLite extends Database {
     };
   }
 
+
   almanacGetAll(dbCtx) { // eslint-disable-line no-unused-vars
     const _scope = _fileScope('almanacGetAll');
     this.logger.debug(_scope, 'called');
@@ -271,6 +276,23 @@ class DatabaseSQLite extends Database {
       return entries.map((entry) => DatabaseSQLite._almanacToNative(entry));
     } catch (e) {
       this.logger.error(_scope, 'failed', { error: e });
+      throw e;
+    }
+  }
+
+
+  almanacUpsert(dbCtx, event, date) {
+    const _scope = _fileScope('almanacUpsert');
+    this.logger.debug(_scope, 'called', { event, date });
+
+    try {
+      const epoch = common.dateToEpoch(date);
+      const result = this.statement.almanacUpsert.run({ event, epoch });
+      if (result.changes != 1) {
+        throw new DBErrors.UnexpectedResult('did not upsert almanac event');
+      }
+    } catch (e) {
+      this.logger.error(_scope, 'failed', { error: e, event, date });
       throw e;
     }
   }
@@ -539,7 +561,7 @@ class DatabaseSQLite extends Database {
     const _scope = _fileScope('scopeCleanup');
     this.logger.debug(_scope, 'called', { atLeastMsSinceLast });
 
-    const almanacEvent = 'scopeCleanup';
+    const almanacEvent = Enum.AlmanacEntry.ScopeCleanup;
     try {
       return this.db.transaction(() => {
 
@@ -617,7 +639,7 @@ class DatabaseSQLite extends Database {
     const _scope = _fileScope('tokenCleanup');
     this.logger.debug(_scope, 'called', { codeLifespanSeconds, atLeastMsSinceLast });
 
-    const almanacEvent = 'tokenCleanup';
+    const almanacEvent = Enum.AlmanacEntry.TokenCleanup;
     try {
       return this.db.transaction(() => {
 
@@ -730,6 +752,66 @@ class DatabaseSQLite extends Database {
       return tokens.map(DatabaseSQLite._tokenToNative);
     } catch (e) {
       this.logger.error(_scope, 'failed', { error: e, identifier });
+      throw e;
+    }
+  }
+
+
+  ticketRedeemed(dbCtx, redeemedData) {
+    const _scope = _fileScope('ticketRedeemed');
+    this.logger.debug(_scope, 'called', { ...redeemedData });
+
+    try {
+      const result = this.statement.ticketRedeemed.run(redeemedData);
+      if (result.changes != 1) {
+        throw new DBErrors.UnexpectedResult('did not store redeemed ticket');
+      }
+    } catch (e) {
+      this.logger.error(_scope, 'failed', { error: e });
+      throw e;
+    }
+  }
+
+
+  ticketTokenPublished(dbCtx, redeemedData) {
+    const _scope = _fileScope('ticketRedeemed');
+    this.logger.debug(_scope, 'called', { ...redeemedData });
+
+    const almanacEvent = Enum.AlmanacEntry.TicketPublished;
+    try {
+      const result = this.statement.ticketTokenPublished.run(redeemedData);
+      if (result.changes != 1) {
+        throw new DBErrors.UnexpectedResult('did not store redeemed ticket');
+      }
+      const epoch = common.dateToEpoch();
+      const almanacResult = this.statement.almanacUpsert.run({ event: almanacEvent, epoch });
+      if (almanacResult.changes != 1) {
+        throw new DBErrors.UnexpectedResult('did not update almanac');
+      }
+
+    } catch (e) {
+      this.logger.error(_scope, 'failed', { error: e });
+      throw e;
+    }
+  }
+
+  static _redeemedTicketToNative(redeemedTicket) {
+    redeemedTicket.created = new Date(Number(redeemedTicket.created) * 1000);
+    if (redeemedTicket.published) {
+      redeemedTicket.published = new Date(Number(redeemedTicket.published) * 1000);
+    }
+    return redeemedTicket;
+  }
+
+  ticketTokenGetUnpublished() {
+    const _scope = _fileScope('ticketTokenGetUnpublished');
+    this.logger.debug(_scope, 'called');
+
+    try {
+      const unpublished = this.statement.ticketTokenGetUnpublished.all();
+      return unpublished.map((x) => DatabaseSQLite._redeemedTicketToNative(x));
+    } catch (e) {
+      this.logger.error(_scope, 'failed', { error: e });
       throw e;
     }
   }

@@ -405,6 +405,65 @@ describe('Database Integration', function () {
         });
       }); // Token
 
+      describe('Ticket Token Tracking', function () {
+        let redeemedData;
+        beforeEach(function () {
+          redeemedData = {
+            subject: 'https://entity.example.com/',
+            resource: 'https://blog.example.com/secret_entry',
+            iss: 'https://idp.example.com/',
+            ticket: 'xxxTICKETxxx',
+            token: 'xxxTOKENxxx',
+          };
+        });
+        step('stores redeemed ticket data', async function () {
+          await db.context(async (dbCtx) => {
+            await db.ticketRedeemed(dbCtx, redeemedData);
+          });
+        });
+        step('gets one pending-publish ticket tokens', async function () {
+          await db.context(async (dbCtx) => {
+            const unpublished = await db.ticketTokenGetUnpublished(dbCtx);
+            assert.strictEqual(unpublished.length, 1);
+            const record = unpublished[0];
+            assert(record.created);
+            assert(!record.published);
+            assert(record.ticketId);
+            delete record.created;
+            delete record.published;
+            delete record.ticketId;
+            assert.deepStrictEqual(record, redeemedData);
+          });
+        });
+        step('stores published ticket token data', async function () {
+          await db.context(async (dbCtx) => {
+            await db.ticketTokenPublished(dbCtx, redeemedData);
+          });
+        });
+        step('gets no pending-publish ticket tokens', async function () {
+          await db.context(async (dbCtx) => {
+            const unpublished = await db.ticketTokenGetUnpublished(dbCtx);
+            assert.strictEqual(unpublished.length, 0);
+          });
+        });
+      }); // Ticket Token Tracking
+
+      describe('Bookkeeping', function () {
+        let event, date;
+        beforeEach(function () {
+          event = 'integrationTestEvent';
+          date = new Date('Fri Dec 22 03:27 UTC 2023');
+        });
+        step('inserts event', async function () {
+          await db.context(async (dbCtx) => {
+            await db.almanacUpsert(dbCtx, event, date);
+            const result = await db.almanacGetAll(dbCtx);
+            const [storedEvent] = result.filter((e) => e.event === event);
+            assert.deepStrictEqual(storedEvent.date, date);
+          });
+        });
+      }); // Bookkeeping
+
       describe('Refreshable Token', function () {
         let created, codeId, scopes, clientId, profileData, lifespanSeconds, refreshLifespanSeconds, removeScopes;
         beforeEach(function () {

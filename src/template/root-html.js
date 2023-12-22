@@ -54,6 +54,9 @@ module.exports = (ctx, options) => {
         href: 'admin/ticket',
       },
     ],
+    headElements: [
+      `<link rel="indieauth-metadata" href="${options.dingus.selfBaseUrl}${options.route.metadata}">`,
+    ],
   };
   const content = [
     aboutSection(),

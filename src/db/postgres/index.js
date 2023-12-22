@@ -11,6 +11,7 @@ const { unappliedSchemaVersions } = require('../schema-version-helper');
 const Database = require('../abstract');
 const DBErrors = require('../errors');
 const common = require('../../common');
+const Enum = require('../../enum');
 
 const _fileScope = common.fileScope(__filename);
 
@@ -28,7 +29,7 @@ const schemaVersionsSupported = {
   },
   max: {
     major: 1,
-    minor: 0,
+    minor: 1,
     patch: 0,
   },
 };
@@ -197,9 +198,11 @@ class DatabasePostgres extends Database {
       if (really) {
         await this.db.tx(async (t) => {
           await t.batch([
+            'almanac',
             'authentication',
-            'resource',
             'profile',
+            'redeemed_ticket',
+            'resource',
             'token',
           ].map(async (table) => t.query('TRUNCATE TABLE $(table:name) CASCADE', { table })));
         });
@@ -230,6 +233,22 @@ class DatabasePostgres extends Database {
       return await dbCtx.manyOrNone(this.statement.almanacGetAll);
     } catch (e) {
       this.logger.error(_scope, 'failed', { error: e });
+      throw e;
+    }
+  }
+
+
+  async almanacUpsert(dbCtx, event, date) {
+    const _scope = _fileScope('almanacUpsert');
+    this.logger.debug(_scope, 'called', { event, date });
+
+    try {
+      const result = await dbCtx.result(this.statement.almanacUpsert, { event, date: date ?? new Date() });
+      if (result.rowCount != 1) {
+        throw new DBErrors.UnexpectedResult('did not upsert almanac event');
+      }
+    } catch (e) {
+      this.logger.error(_scope, 'failed', { error: e, event, date });
       throw e;
     }
   }
@@ -464,7 +483,7 @@ class DatabasePostgres extends Database {
     const _scope = _fileScope('scopeCleanup');
     this.logger.debug(_scope, 'called', { atLeastMsSinceLast });
 
-    const almanacEvent = 'scopeCleanup';
+    const almanacEvent = Enum.AlmanacEntry.ScopeCleanup;
     try {
       return await this.transaction(dbCtx, async (txCtx) => {
 
@@ -543,7 +562,7 @@ class DatabasePostgres extends Database {
     const _scope = _fileScope('tokenCleanup');
     this.logger.debug(_scope, 'called', { codeLifespanSeconds, atLeastMsSinceLast });
 
-    const almanacEvent = 'tokenCleanup';
+    const almanacEvent = Enum.AlmanacEntry.TokenCleanup;
     try {
       return await this.transaction(dbCtx, async (txCtx) => {
 
@@ -629,6 +648,55 @@ class DatabasePostgres extends Database {
       return await dbCtx.manyOrNone(this.statement.tokensGetByIdentifier, { identifier });
     } catch (e) {
       this.logger.error(_scope, 'failed', { error: e, identifier });
+      throw e;
+    }
+  }
+
+
+  async ticketRedeemed(dbCtx, redeemedData) {
+    const _scope = _fileScope('ticketRedeemed');
+    this.logger.debug(_scope, 'called', { ...redeemedData });
+
+    try {
+      const result = await dbCtx.result(this.statement.ticketRedeemed, redeemedData);
+      if (result.rowCount != 1) {
+        throw new DBErrors.UnexpectedResult('did not store redeemed ticket');
+      }
+    } catch (e) {
+      this.logger.error(_scope, 'failed', { error: e, ...redeemedData });
+      throw e;
+    }
+  }
+
+
+  async ticketTokenPublished(dbCtx, redeemedData) {
+    const _scope = _fileScope('ticketRedeemed');
+    this.logger.debug(_scope, 'called', { ...redeemedData });
+
+    const almanacEvent = Enum.AlmanacEntry.TicketPublished;
+    try {
+      const result = await dbCtx.result(this.statement.ticketTokenPublished, redeemedData);
+      if (result.rowCount != 1) {
+        throw new DBErrors.UnexpectedResult('did not store redeemed ticket');
+      }
+      const almanacResult = await dbCtx.result(this.statement.almanacUpsert, { event: almanacEvent, date: new Date() });
+      if (almanacResult.rowCount != 1) {
+        throw new DBErrors.UnexpectedResult('did not update almanac');
+      }
+    } catch (e) {
+      this.logger.error(_scope, 'failed', { error: e, ...redeemedData });
+      throw e;
+    }
+  }
+
+  async ticketTokenGetUnpublished(dbCtx) {
+    const _scope = _fileScope('ticketTokenGetUnpublished');
+    this.logger.debug(_scope, 'called');
+
+    try {
+      return await dbCtx.manyOrNone(this.statement.ticketTokenGetUnpublished);
+    } catch (e) {
+      this.logger.error(_scope, 'failed', { error: e });
       throw e;
     }
   }
