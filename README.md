@@ -29,7 +29,7 @@ This service can accept proffered [authentication tickets](https://indieweb.org/
 
 Ensure the output of the script `bin/ticket-queue-profile.js` is executed on RabbitMQ server to install the needed queue profile.
 
-A rudimentary ticket-sending UI is also available:
+A ticket-sending UI is also available:
 ![Ticket Offer page](./documentation/media/ticket-page.png)
 
 ## Architecture
