@@ -19,13 +19,13 @@ function renderClientIdentifierProperties(hApp) {
   const { url, summary, logo, name } = properties;
 
   parts.push('<span class="client-identifier">');
-  if (url && url.length) {
+  if (url?.length) {
     parts.push(`<a href="${url[0]}">`);
   }
-  if (summary && summary.length) {
+  if (summary?.length) {
     imgTitle = ` title="${summary[0]}"`;
   }
-  if (logo && logo.length) {
+  if (logo?.length) {
     let src, alt;
     if (typeof logo[0] === 'string') {
       src = logo[0];
@@ -35,10 +35,10 @@ function renderClientIdentifierProperties(hApp) {
     }
     parts.push(`<img src="${src}" alt="${alt}"${imgTitle}>`);
   }
-  if (name && name.length) {
+  if (name?.length) {
     parts.push(properties['name'][0]);
   }
-  if (url && url.length) {
+  if (url?.length) {
     parts.push('</a>');
   }
   parts.push('</span>');
@@ -52,7 +52,7 @@ function renderClientIdentifierProperties(hApp) {
  * @returns {String}
  */
 function renderClientIdentifier(clientIdentifier) {
-  const hAppEntries = clientIdentifier && clientIdentifier.items || [];
+  const hAppEntries = clientIdentifier?.items || [];
   return hAppEntries.map(renderClientIdentifierProperties).join('');
 }
 
@@ -74,7 +74,7 @@ function renderProfileOption(profile, selected) {
  */
 function renderProfileFieldset(availableProfiles, hintProfile) {
   if (!availableProfiles || availableProfiles.length <= 1) {
-    const profile = availableProfiles && availableProfiles[0] || hintProfile;
+    const profile = availableProfiles?.[0] || hintProfile;
     return `<input type="hidden" name="me" value="${profile}">`;
   }
   return `
@@ -109,7 +109,7 @@ function renderScopeCheckboxLI(scope, checked) {
     scopeDescription = '';
   }
   let profileClass;
-  if (scope.profiles && scope.profiles.length) {
+  if (scope.profiles?.length) {
     profileClass = ['profile-scope'].concat(scope.profiles.map((profile) => th.escapeCSS(profile))).join(' ');
   } else {
     profileClass = '';
@@ -123,7 +123,7 @@ function renderScopeCheckboxLI(scope, checked) {
 
 
 function renderRequestedScopes(requestedScopes) {
-  if (!requestedScopes || !requestedScopes.length) {
+  if (!requestedScopes?.length) {
     return '';
   }
   return `
@@ -264,11 +264,13 @@ function radioButton(name, value, label, checked = false, indent = 0) {
  */
 function mainContent(ctx, options) { // eslint-disable-line no-unused-vars
   const session = ctx.session || {};
-  const hintedProfile = (session.me && session.me.href) || (session.profiles && session.profiles.length && session.profiles[0]) || '';
+  const hintedProfile = session.me?.href || session.profiles?.[0] || '';
   const scopeIndex = session.scopeIndex || {};
 
-  // Add requested scopes to index, if not already present,
-  // and de-associate requested scopes from profiles.
+  /**
+   * Add requested scopes to index, if not already present,
+   * and de-associate requested scopes from profiles.
+   */
   const scopes = session.scope || [];
   scopes.forEach((scopeName) => {
     if ((scopeName in scopeIndex)) {

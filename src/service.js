@@ -13,6 +13,7 @@ const { Authenticator, SessionManager } = require('@squeep/authentication-module
 const { ResourceAuthenticator } = require('@squeep/resource-authentication-module');
 const { TemplateHelper: { initContext } } = require('@squeep/html-template-helper');
 const Enum = require('./enum');
+const { ResponseError } = require('./errors');
 
 const _fileScope = common.fileScope(__filename);
 
@@ -54,6 +55,9 @@ class Service extends Dingus {
 
     // Information page about service
     this.on(['GET'], '/', this.handlerGetRoot.bind(this));
+
+    // Temmporary to see what rando payload someone is sending us unsolicited
+    this.on(['POST'], '/', this.handlerWhaGwan.bind(this));
 
     // Give load-balancers something to check
     this.on(['GET'], route('healthcheck'), this.handlerGetHealthcheck.bind(this));
@@ -108,7 +112,7 @@ class Service extends Dingus {
 
     const logObject = this.asyncLocalStorage.getStore();
     // istanbul ignore else
-    if (logObject) { // debugging in vscode seems to kill ALS, work around
+    if (logObject) { // Debugging in vscode seems to kill ALS, work around
       logObject.requestId = ctx.requestId;
       delete ctx.requestId;
     } else {
@@ -472,6 +476,15 @@ class Service extends Dingus {
     await this.manager.getRoot(res, ctx);
   }
 
+
+  /**
+   * Temporary to see what an unsolicited payload contains.
+   */
+  async handlerWhaGwan(req, res, ctx) {
+    this.setResponseType(this.responseTypes, req, res, ctx);
+    await this.ingestBody(req, res, ctx);
+    throw new ResponseError(Enum.ErrorResponse.MethodNotAllowed);
+  }
 
   /**
    * @param {http.IncomingMessage} req 

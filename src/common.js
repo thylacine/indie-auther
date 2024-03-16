@@ -2,8 +2,8 @@
 
 const { common } = require('@squeep/api-dingus');
 
-const { randomBytes } = require('crypto');
-const { promisify } = require('util');
+const { randomBytes } = require('node:crypto');
+const { promisify } = require('node:util');
 const randomBytesAsync = promisify(randomBytes);
 
 /**
@@ -58,7 +58,7 @@ const ensureArray = (x) => {
 const freezeDeep = (o) => {
   Object.freeze(o);
   Object.getOwnPropertyNames(o).forEach((prop) => {
-    if (Object.hasOwnProperty.call(o, prop)
+    if (Object.hasOwn(o, prop)
     &&  ['object', 'function'].includes(typeof o[prop]) // eslint-disable-line security/detect-object-injection
     &&  !Object.isFrozen(o[prop])) { // eslint-disable-line security/detect-object-injection
       return freezeDeep(o[prop]); // eslint-disable-line security/detect-object-injection
@@ -134,7 +134,7 @@ const dateToEpoch = (date) => {
 
 
 const omit = (o, props) => {
-  return Object.fromEntries(Object.entries(o).filter(([k]) => !props.includes(k)))
+  return Object.fromEntries(Object.entries(o).filter(([k]) => !props.includes(k)));
 };
 
 

@@ -225,6 +225,11 @@ class DatabasePostgres extends Database {
   }
 
 
+  static _almanacErrorThrow() {
+    throw new DBErrors.UnexpectedResult('did not update almanac');
+  }
+
+
   async almanacGetAll(dbCtx) {
     const _scope = _fileScope('almanacGetAll');
     this.logger.debug(_scope, 'called');
@@ -245,7 +250,7 @@ class DatabasePostgres extends Database {
     try {
       const result = await dbCtx.result(this.statement.almanacUpsert, { event, date: date ?? new Date() });
       if (result.rowCount != 1) {
-        throw new DBErrors.UnexpectedResult('did not upsert almanac event');
+        this.constructor._almanacErrorThrow();
       }
     } catch (e) {
       this.logger.error(_scope, 'failed', { error: e, event, date });
@@ -502,7 +507,7 @@ class DatabasePostgres extends Database {
         // Update the last cleanup time
         const result = await txCtx.result(this.statement.almanacUpsert, { event: almanacEvent, date: now });
         if (result.rowCount != 1) {
-          throw new DBErrors.UnexpectedResult('did not update almanac');
+          this.constructor._almanacErrorThrow();
         }
 
         this.logger.debug(_scope, 'completed', { scopesRemoved, atLeastMsSinceLast });
@@ -581,7 +586,7 @@ class DatabasePostgres extends Database {
         // Update the last cleanup time
         const result = await txCtx.result(this.statement.almanacUpsert, { event: almanacEvent, date: now });
         if (result.rowCount != 1) {
-          throw new DBErrors.UnexpectedResult('did not update almanac');
+          this.constructor._almanacErrorThrow();
         }
 
         this.logger.debug(_scope, 'completed', { tokensRemoved, codeLifespanSeconds, atLeastMsSinceLast });
@@ -681,7 +686,7 @@ class DatabasePostgres extends Database {
       }
       const almanacResult = await dbCtx.result(this.statement.almanacUpsert, { event: almanacEvent, date: new Date() });
       if (almanacResult.rowCount != 1) {
-        throw new DBErrors.UnexpectedResult('did not update almanac');
+        this.constructor._almanacErrorThrow();
       }
     } catch (e) {
       this.logger.error(_scope, 'failed', { error: e, ...redeemedData });

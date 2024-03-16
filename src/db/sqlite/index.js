@@ -267,6 +267,11 @@ class DatabaseSQLite extends Database {
   }
 
 
+  static _almanacErrorThrow() {
+    throw new DBErrors.UnexpectedResult('did not update almanac');
+  }
+
+
   almanacGetAll(dbCtx) { // eslint-disable-line no-unused-vars
     const _scope = _fileScope('almanacGetAll');
     this.logger.debug(_scope, 'called');
@@ -289,7 +294,7 @@ class DatabaseSQLite extends Database {
       const epoch = common.dateToEpoch(date);
       const result = this.statement.almanacUpsert.run({ event, epoch });
       if (result.changes != 1) {
-        throw new DBErrors.UnexpectedResult('did not upsert almanac event');
+        this.constructor._almanacErrorThrow();
       }
     } catch (e) {
       this.logger.error(_scope, 'failed', { error: e, event, date });
@@ -580,7 +585,7 @@ class DatabaseSQLite extends Database {
         // Update the last cleanup time
         const result = this.statement.almanacUpsert.run({ event: almanacEvent, epoch: nowEpoch });
         if (result.changes != 1) {
-          throw new DBErrors.UnexpectedResult('did not update almanac');
+          this.constructor._almanacErrorThrow();
         }
 
         this.logger.debug(_scope, 'finished', { scopesRemoved, atLeastMsSinceLast });
@@ -658,7 +663,7 @@ class DatabaseSQLite extends Database {
         // Update the last cleanup time
         const result = this.statement.almanacUpsert.run({ event: almanacEvent, epoch: nowEpoch });
         if (result.changes != 1) {
-          throw new DBErrors.UnexpectedResult('did not update almanac');
+          this.constructor._almanacErrorThrow();
         }
 
         this.logger.debug(_scope, 'finished', { tokensRemoved, codeLifespanSeconds, atLeastMsSinceLast });
@@ -786,7 +791,7 @@ class DatabaseSQLite extends Database {
       const epoch = common.dateToEpoch();
       const almanacResult = this.statement.almanacUpsert.run({ event: almanacEvent, epoch });
       if (almanacResult.changes != 1) {
-        throw new DBErrors.UnexpectedResult('did not update almanac');
+        this.constructor._almanacErrorThrow();
       }
 
     } catch (e) {

@@ -196,9 +196,10 @@ class Manager {
 
     Manager._sensitiveResponse(res);
 
-    ctx.session = Object.assign({}, ctx.session, {
+    ctx.session = {
+      ...ctx.session,
       errorDescriptions: [],
-    });
+    };
 
     // Ingest and validate expected data, populating ctx.session.
     await this._clientIdRequired(ctx);
@@ -633,7 +634,9 @@ class Manager {
     Manager._sensitiveResponse(res);
 
     // Ensure session exists, persisting any login session data.
-    ctx.session = Object.assign({}, ctx.session);
+    ctx.session = {
+      ...ctx.session,
+    };
     try {
       // Recover the session established on initial auth request.
       const oldSession = await this.mysteryBox.unpack(ctx.parsedBody['session']);
@@ -789,9 +792,10 @@ class Manager {
   async _ingestPostAuthorizationRequest(ctx) {
     const _scope = _fileScope('_ingestPostAuthorizationRequest');
 
-    ctx.session = Object.assign({}, ctx.session, {
+    ctx.session = {
+      ...ctx.session,
       errorDescriptions: [],
-    });
+    };
 
     if (!ctx.parsedBody) {
       this.logger.debug(_scope, 'no body data', { ctx });
@@ -1397,7 +1401,9 @@ class Manager {
     const _scope = _fileScope('postToken');
     this.logger.debug(_scope, 'called', { ctx });
 
-    ctx.session = Object.assign({}, ctx.session);
+    ctx.session = {
+      ...ctx.session,
+    };
 
     await this.db.context(async (dbCtx) => {
 

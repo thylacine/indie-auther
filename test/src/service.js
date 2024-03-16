@@ -291,4 +291,10 @@ describe('Service', function () {
     });
   }); // handlerGetAdminMaintenance
 
+  describe('handlerWhaGwan', function () {
+    it('covers', async function () {
+      await assert.rejects(() => service.handlerWhaGwan(req. res, ctx));
+    });
+  }); // handlerWhaGwan
+
 });
