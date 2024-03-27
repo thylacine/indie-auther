@@ -1,7 +1,7 @@
 'use strict';
 
 const th = require('./template-helper');
-
+const { sessionNavLinks } = require('@squeep/authentication-module');
 
 /**
  * 
@@ -16,11 +16,15 @@ const th = require('./template-helper');
  * @returns {String}
  */
 module.exports = (ctx, options) => {
+  const pagePathLevel = 0;
   const htmlOptions = {
+    pageIdentifier: 'authorizationError',
     pageTitle: options.manager.pageTitle,
     logoUrl: options.manager.logoUrl,
     footerEntries: options.manager.footerEntries,
     errorContent: ctx.errorContent || ['Unknown Error'],
   };
-  return th.htmlPage(0, ctx, htmlOptions, []);
+  th.navLinks(pagePathLevel, ctx, htmlOptions);
+  sessionNavLinks(pagePathLevel, ctx, htmlOptions);
+  return th.htmlPage(pagePathLevel, ctx, htmlOptions, []);
 };

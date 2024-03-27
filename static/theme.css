@@ -96,6 +96,9 @@ main {
 	background-color: lavender;
 	padding: .16em;
 }
+.otp-key-qr svg {
+	height: 30vh;
+}
 .code {
 	font-family: Courier, monospace, serif;
 	font-size: .75em;

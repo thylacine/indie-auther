@@ -29,7 +29,7 @@ const schemaVersionsSupported = {
   },
   max: {
     major: 1,
-    minor: 1,
+    minor: 2,
     patch: 0,
   },
 };
@@ -288,20 +288,56 @@ class DatabasePostgres extends Database {
   }
 
 
-  async authenticationUpsert(dbCtx, identifier, credential) {
+  async authenticationUpsert(dbCtx, identifier, credential, otpKey) {
     const _scope = _fileScope('authenticationUpsert');
+    const scrubbedCredential = '*'.repeat((credential || '').length);
+    const scrubbedOTPKey = '*'.repeat((otpKey || '').length);
+    this.logger.debug(_scope, 'called', { identifier, scrubbedCredential, scrubbedOTPKey });
+
+    try {
+      const result = await dbCtx.result(this.statement.authenticationUpsert, { identifier, credential, otpKey });
+      if (result.rowCount != 1) {
+        throw new DBErrors.UnexpectedResult('did not upsert authentication');
+      }
+    } catch (e) {
+      this.logger.error(_scope, 'failed', { error: e, identifier, scrubbedCredential, scrubbedOTPKey });
+      throw e;
+    }
+  }
+
+
+  async authenticationUpdateOTPKey(dbCtx, identifier, otpKey = null) {
+    const _scope = _fileScope('authenticationUpdateOTPKey');
+    const scrubbedOTPKey = '*'.repeat((otpKey || '').length);
+    this.logger.debug(_scope, 'called', { identifier, scrubbedOTPKey });
+
+    try {
+      const result = await dbCtx.result(this.statement.authenticationUpdateOtpKey, { identifier, otpKey });
+      if (result.rowCount != 1) {
+        throw new DBErrors.UnexpectedResult('did not update otpKey');
+      }
+    } catch (e) {
+      this.logger.error(_scope, 'failed', { error: e, identifier, scrubbedOTPKey });
+      throw e;
+    }
+  }
+
+
+  async authenticationUpdateCredential(dbCtx, identifier, credential) {
+    const _scope = _fileScope('authenticationUpdateCredential');
     const scrubbedCredential = '*'.repeat((credential || '').length);
     this.logger.debug(_scope, 'called', { identifier, scrubbedCredential });
 
     try {
-      const result = await dbCtx.result(this.statement.authenticationUpsert, { identifier, credential });
+      const result = await dbCtx.result(this.statement.authenticationUpdateCredential, { identifier, credential });
       if (result.rowCount != 1) {
-        throw new DBErrors.UnexpectedResult('did not upsert authentication');
+        throw new DBErrors.UnexpectedResult('did not update credential');
       }
     } catch (e) {
       this.logger.error(_scope, 'failed', { error: e, identifier, scrubbedCredential });
       throw e;
     }
+
   }
 
 

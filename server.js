@@ -11,7 +11,7 @@ const { fileScope } = require('./src/common');
 const _fileScope = fileScope(__filename);
 const { version } = require('./package.json');
 
-const PORT = process.env.PORT || 3002;
+const PORT = parseInt(process.env.PORT || 3002);
 const ADDR = process.env.LISTEN_ADDR || '127.0.0.1';
 
 (async function main () {

@@ -5,6 +5,7 @@
  */
 
 const th = require('./template-helper');
+const { sessionNavLinks } = require('@squeep/authentication-module');
 
 
 function renderProfileOption(profile) {
@@ -79,20 +80,18 @@ ${scopesCheckboxRows}
  * @returns {String}
  */
 module.exports = (ctx, options) => {
+  const pagePathLevel = 1;
   const htmlOptions = {
+    padeIdentifier: 'ticketProffer',
     pageTitle: options.manager.pageTitle + ' - Ticket Proffer',
     logoUrl: options.manager.logoUrl,
     footerEntries: options.manager.footerEntries,
-    navLinks: [
-      {
-        text: 'Admin',
-        href: '../admin/',
-      },
-    ],
     errorContent: ['Unable to send ticket.'],
   };
+  th.navLinks(pagePathLevel, ctx, htmlOptions);
+  sessionNavLinks(pagePathLevel, ctx, htmlOptions);
   const content = [
     mainContent(ctx),
   ];
-  return th.htmlPage(2, ctx, htmlOptions, content);
+  return th.htmlPage(pagePathLevel, ctx, htmlOptions, content);
 };

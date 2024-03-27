@@ -137,9 +137,10 @@ describe('Database Integration', function () {
       }); // Resources
 
       describe('Users and Profiles and Scopes', function () {
-        let credential;
+        let credential, otpKey;
         beforeEach(function () {
           credential = '$plain$myPassword';
+          otpKey = '1234567890123456789012';
         });
         step('returns nothing when auth does not exist', async function () {
           await db.context(async (dbCtx) => {
@@ -170,9 +171,25 @@ describe('Database Integration', function () {
         step('update auth entry', async function () {
           await db.context(async (dbCtx) => {
             credential = '$plain$myNewPassword';
-            await db.authenticationUpsert(dbCtx, identifier, credential);
+            await db.authenticationUpsert(dbCtx, identifier, credential, otpKey);
             const authInfo = await db.authenticationGet(dbCtx, identifier);
             assert.strictEqual(authInfo.credential, credential);
+            assert.strictEqual(authInfo.otpKey, otpKey);
+          });
+        });
+        step('update auth credential', async function () {
+          await db.context(async (dbCtx) => {
+            credential = '$plain$anotherNewPassword';
+            await db.authenticationUpdateCredential(dbCtx, identifier, credential);
+            const authInfo = await db.authenticationGet(dbCtx, identifier);
+            assert.strictEqual(authInfo.credential, credential);
+          });
+        });
+        step('update auth otp', async function () {
+          await db.context(async (dbCtx) => {
+            await db.authenticationUpdateOTPKey(dbCtx, identifier, otpKey);
+            const authInfo = await db.authenticationGet(dbCtx, identifier);
+            assert.strictEqual(authInfo.otpKey, otpKey);
           });
         });
         step('profile is not valid', async function () {

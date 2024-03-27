@@ -92,4 +92,34 @@ describe('Template Helper', function () {
     });
   }); // scopeCompare
 
+  describe('navLinks', function () {
+    let pagePathLevel, ctx, options;
+    beforeEach(function () {
+      pagePathLevel = 1;
+      ctx = {};
+      options = {
+        navLinks: [],
+      };
+    });
+    it('populates navLinks', function () {
+      th.navLinks(pagePathLevel, ctx, options);
+      assert.strictEqual(options.navLinks.length, 2);
+    });
+    it('creates and populates navLinks', function () {
+      delete options.navLinks;
+      th.navLinks(pagePathLevel, ctx, options);
+      assert.strictEqual(options.navLinks.length, 2);
+    });
+    it('populates navLink when on admin', function () {
+      options.pageIdentifier = 'admin';
+      th.navLinks(pagePathLevel, ctx, options);
+      assert.strictEqual(options.navLinks.length, 1);
+    });
+    it('populates navLink when on ticketProffer', function () {
+      options.pageIdentifier = 'ticketProffer';
+      th.navLinks(pagePathLevel, ctx, options);
+      assert.strictEqual(options.navLinks.length, 1);
+    });
+  }); // navLinks
+
 }); // Template Helper

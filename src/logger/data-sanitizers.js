@@ -9,15 +9,68 @@
 function sanitizePostCredential(data, sanitize = true) {
   let unclean = false;
 
-  const credentialLength = data?.ctx?.parsedBody?.credential?.length;
-  if (credentialLength) {
-    unclean = true;
-  }
-  if (unclean && sanitize) {
-    data.ctx.parsedBody.credential = '*'.repeat(credentialLength);
-  }
+  [
+    'credential',
+    'credential-old',
+    'credential-new',
+    'credential-new-2',
+  ].forEach((k) => {
+    const credentialLength = data?.ctx?.parsedBody?.[k]?.length; // eslint-disable-line security/detect-object-injection
+    const kUnclean = !!credentialLength;
+    unclean |= kUnclean;
+    if (kUnclean && sanitize) {
+      data.ctx.parsedBody[k] = '*'.repeat(credentialLength); // eslint-disable-line security/detect-object-injection
+    }
+  });
 
   return unclean;
+}
+
+
+/**
+ * Scrub sensitive data from context.
+ * @param {Object} data
+ * @param {Boolean} sanitize
+ * @returns {Boolean}
+ */
+function sanitizeContext(data, sanitize = true) {
+  let unclean = false;
+
+  // hide keys
+  [
+    'otpKey',
+    'otpConfirmKey',
+  ].forEach((k) => {
+    const secretLength = data?.ctx?.[k]?.length; // eslint-disable-line security/detect-object-injection
+    const kUnclean = !! secretLength;
+    unclean |= kUnclean;
+    if (kUnclean && sanitize) {
+      data.ctx[k] = '*'.repeat(secretLength); // eslint-disable-line security/detect-object-injection
+    }
+  });
+
+  // shorten mystery boxes
+  [
+    'otpConfirmBox',
+    'otpState',
+  ].forEach((k) => {
+    const mysteryLength = data?.ctx?.[k]?.length; // eslint-disable-line security/detect-object-injection
+    const mUnclean = !! mysteryLength;
+    unclean |= mUnclean;
+    if (mUnclean && sanitize) {
+      data.ctx[k] = `[scrubbed ${mysteryLength} bytes]`; // eslint-disable-line security/detect-object-injection
+    }
+  });
+
+  const cookieLength = data?.ctx?.cookie?.squeepSession?.length;
+  if (cookieLength) {
+    unclean |= true;
+    if (sanitize) {
+      data.ctx.cookie.squeepSession = `[scrubbed ${cookieLength} bytes]`;
+    }
+  }
+
+  return !! unclean;
 }
 
 
@@ -112,5 +165,6 @@ const _sanitizeProfilesScopes = (scopesEntries, profilesEntries) => {
 
 module.exports = {
   sanitizePostCredential,
+  sanitizeContext,
   reduceScopeVerbosity,
 };

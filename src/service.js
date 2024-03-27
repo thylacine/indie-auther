@@ -11,7 +11,7 @@ const common = require('./common');
 const Manager = require('./manager');
 const { Authenticator, SessionManager } = require('@squeep/authentication-module');
 const { ResourceAuthenticator } = require('@squeep/resource-authentication-module');
-const { TemplateHelper: { initContext } } = require('@squeep/html-template-helper');
+const { initContext, navLinks } = require('./template/template-helper');
 const Enum = require('./enum');
 const { ResponseError } = require('./errors');
 
@@ -23,6 +23,7 @@ class Service extends Dingus {
       ...options.dingus,
       ignoreTrailingSlash: false,
     });
+    this.options = options;
     this.asyncLocalStorage = asyncLocalStorage;
     this.staticPath = path.normalize(path.join(__dirname, '..', 'static'));
     this.manager = new Manager(logger, db, options);
@@ -83,6 +84,8 @@ class Service extends Dingus {
     this.on(['GET'], '/admin/login', this.handlerGetAdminLogin.bind(this));
     this.on(['POST'], '/admin/login', this.handlerPostAdminLogin.bind(this));
     this.on(['GET'], '/admin/logout', this.handlerGetAdminLogout.bind(this));
+    this.on(['GET'], '/admin/settings', this.handlerGetAdminSettings.bind(this));
+    this.on(['POST'], '/admin/settings', this.handlerPostAdminSettings.bind(this));
 
     // Page for upkeep info et cetera
     this.on(['GET'], '/admin/maintenance', this.handlerGetAdminMaintenance.bind(this));
@@ -134,7 +137,7 @@ class Service extends Dingus {
 
     await this.authenticator.sessionOptionalLocal(req, res, ctx);
 
-    await this.sessionManager.getAdminLogin(res, ctx);
+    await this.sessionManager.getAdminLogin(res, ctx, navLinks);
   }
 
 
@@ -155,7 +158,46 @@ class Service extends Dingus {
 
     await this.ingestBody(req, res, ctx);
 
-    await this.sessionManager.postAdminLogin(res, ctx);
+    await this.sessionManager.postAdminLogin(res, ctx, navLinks);
+  }
+
+
+  /**
+   * @param {http.IncomingMessage} req
+   * @param {http.ServerResponse} res
+   * @param {Object} ctx
+   */
+  async handlerGetAdminSettings(req, res, ctx) {
+    const _scope = _fileScope('handlerGetAdminSettings');
+    this.logger.debug(_scope, 'called', { req, ctx });
+
+    initContext(ctx);
+
+    this.setResponseType(this.responseTypes, req, res, ctx);
+
+    if (await this.authenticator.sessionRequiredLocal(req, res, ctx)) {
+      await this.sessionManager.getAdminSettings(res, ctx, navLinks);
+    }
+  }
+
+
+  /**
+   * @param {http.IncomingMessage} req
+   * @param {http.ServerResponse} res
+   * @param {Object} ctx
+   */
+  async handlerPostAdminSettings(req, res, ctx) {
+    const _scope = _fileScope('handlerPostAdminSettings');
+    this.logger.debug(_scope, 'called', { req, ctx });
+
+    initContext(ctx);
+
+    this.setResponseType(this.responseTypes, req, res, ctx);
+
+    if (await this.authenticator.sessionRequiredLocal(req, res, ctx)) {
+      await this.ingestBody(req, res, ctx);
+      await this.sessionManager.postAdminSettings(res, ctx, navLinks);
+    }
   }
 
 

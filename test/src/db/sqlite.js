@@ -309,6 +309,54 @@ describe('DatabaseSQLite', function () {
     });
   }); // authenticationUpsert
 
+  describe('authenticationUpdateCredential', function () {
+    let identifier, credential;
+    beforeEach(function () {
+      identifier = 'username';
+      credential = '$z$foo';
+    });
+    it('success', function() {
+      const dbResult = {
+        changes: 1,
+        lastInsertRowid: undefined,
+      };
+      sinon.stub(db.statement.authenticationUpdateCredential, 'run').returns(dbResult);
+      db.authenticationUpdateCredential(dbCtx, identifier, credential);
+    });
+    it('failure', function () {
+      const dbResult = {
+        changes: 0,
+        lastInsertRowid: undefined,
+      };
+      sinon.stub(db.statement.authenticationUpdateCredential, 'run').returns(dbResult);
+      assert.throws(() => db.authenticationUpdateCredential(dbCtx, identifier, credential), DBErrors.UnexpectedResult);
+    });
+  }); // authenticationUpdateCredential
+
+  describe('authenticationUpdateOTPKey', function () {
+    let identifier, otpKey;
+    beforeEach(function () {
+      identifier = 'username';
+      otpKey = '1234567890123456789012';
+    });
+    it('success', function() {
+      const dbResult = {
+        changes: 1,
+        lastInsertRowid: undefined,
+      };
+      sinon.stub(db.statement.authenticationUpdateOtpKey, 'run').returns(dbResult);
+      db.authenticationUpdateOTPKey(dbCtx, identifier, otpKey);
+    });
+    it('failure', function () {
+      const dbResult = {
+        changes: 0,
+        lastInsertRowid: undefined,
+      };
+      sinon.stub(db.statement.authenticationUpdateOtpKey, 'run').returns(dbResult);
+      assert.throws(() => db.authenticationUpdateOTPKey(dbCtx, identifier, otpKey), DBErrors.UnexpectedResult);
+    });
+  }); // authenticationUpdateOTPKey
+
   describe('profileIdentifierInsert', function () {
     let profile, identifier;
     beforeEach(function () {

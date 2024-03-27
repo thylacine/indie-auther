@@ -1,0 +1,121 @@
+digraph indieAutherERD {
+	graph[
+		rankdir=LR,
+		overlap=false,
+		splines=true,
+		label="IndieAuther Entity-Relations\SQLite\nSchema 1.1.0",
+		labelloc="t",
+		fontsize=26,
+	];
+	// layout=neato;
+	node[shape=plain];
+	edge[arrowhead=crow];
+
+	redeemed_ticket [label=<
+	<table cellspacing="0" cellborder="1" border="0">
+		<tr><td border="2" bgcolor="lightblue">REDEEMED_TICKET</td></tr>
+		<tr><td port="pk_ticket_id">ticket_id</td></tr>
+		<tr><td port="">created</td></tr>
+		<tr><td port="">subject</td></tr>
+		<tr><td port="">resource</td></tr>
+		<tr><td port="">iss</td></tr>
+		<tr><td port="">token</td></tr>
+		<tr><td port="">ticket</td></tr>
+		<tr><td port="">published</td></tr>
+	</table>
+	>]
+
+	token [label=<
+	<table cellspacing="0" cellborder="1" border="0">
+		<tr><td border="2" bgcolor="lightblue">TOKEN</td></tr>
+		<tr><td port="pk_code_id">code_id</td></tr>
+		<tr><td port="fk_profile_id">profile_id</td></tr>
+		<tr><td port="">created</td></tr>
+		<tr><td port="">expires</td></tr>
+		<tr><td port="">refresh_expires</td></tr>
+		<tr><td port="">refreshed</td></tr>
+		<tr><td port="">duration</td></tr>
+		<tr><td port="">refresh_duration</td></tr>
+		<tr><td port="">refresh_count</td></tr>
+		<tr><td port="">is_revoked</td></tr>
+		<tr><td port="">is_token</td></tr>
+		<tr><td port="">client_id</td></tr>
+		<tr><td port="">resource</td></tr>
+		<tr><td port="">profile_data</td></tr>
+	</table>
+	>];
+	profile:pk_profile_id -> token:fk_profile_id;
+
+	scope [label=<
+	<table cellspacing="0" cellborder="1" border="0">
+		<tr><td border="2" bgcolor="lightblue">SCOPE</td></tr>
+		<tr><td port="pk_scope_id">scope_id</td></tr>
+		<tr><td port="">scope</td></tr>
+		<tr><td port="">description</td></tr>
+		<tr><td port="">application</td></tr>
+		<tr><td port="">is_permanent</td></tr>
+		<tr><td port="">is_manually_added</td></tr>
+	</table>
+	>];
+
+	token_scope [label=<
+	<table cellspacing="0" cellborder="1" border="0">
+		<tr><td border="2" bgcolor="lightblue">TOKEN_SCOPE</td></tr>
+		<tr><td port="fk_code_id">code_id</td></tr>
+		<tr><td port="fk_scope_id">scope_id</td></tr>
+	</table>
+	>];
+	token:pk_code_id -> token_scope:fk_code_id;
+	scope:pk_scope_id -> token_scope:fk_scope_id;
+
+	profile [label=<
+	<table cellspacing="0" cellborder="1" border="0">
+		<tr><td border="2" bgcolor="lightblue">PROFILE</td></tr>
+		<tr><td port="pk_profile_id">profile_id</td></tr>
+		<tr><td port="fk_identifier_id">identifier_id</td></tr>
+		<tr><td port="">profile</td></tr>
+	</table>
+	>];
+	authentication:pk_identifier_id -> profile:fk_identifier_id;
+
+	profile_scope [label=<
+	<table cellspacing="0" cellborder="1" border="0">
+		<tr><td border="2" bgcolor="lightblue">PROFILE_SCOPE</td></tr>
+		<tr><td port="fk_profile_id">profile_id</td></tr>
+		<tr><td port="fk_scope_id">scope_id</td></tr>
+	</table>
+	>];
+	profile:pk_profile_id -> profile_scope:fk_profile_id;
+	scope:pk_scope_id -> profile_scope:fk_scope_id;
+
+	authentication [label=<
+	<table cellspacing="0" cellborder="1" border="0">
+			<tr><td border="2" bgcolor="lightblue">AUTHENTICATION</td></tr>
+			<tr><td port="pk_identifier_id">identifier_id</td></tr>
+			<tr><td port="">created</td></tr>
+			<tr><td port="">last_authenticated</td></tr>
+			<tr><td port="">identifier</td></tr>
+			<tr><td port="">credential</td></tr>
+			<tr><td port="">otp_key</td></tr>
+	</table>
+	>];
+
+	resource [label=<
+	<table cellspacing="0" cellborder="1" border="0">
+		<tr><td border="2" bgcolor="lightblue">RESOURCE</td></tr>
+		<tr><td port="pk_resource_id">resource_id</td></tr>
+		<tr><td port="">description</td></tr>
+		<tr><td port="">created</td></tr>
+		<tr><td port="">secret</td></tr>
+	</table>
+	>];
+
+	almanac [label=<
+	<table cellspacing="0" cellborder="1" border="0">
+		<tr><td border="2" bgcolor="lightblue">ALMANAC</td></tr>
+		<tr><td port="pk_event">event</td></tr>
+		<tr><td port="">epoch</td></tr>
+	</table>
+	>];
+
+}

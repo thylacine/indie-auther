@@ -7,6 +7,7 @@
  */
 
 const th = require('./template-helper');
+const { sessionNavLinks } = require('@squeep/authentication-module');
 
 
 function renderProfileLI(profile) {
@@ -196,17 +197,15 @@ ${tokenTable(ctx.tokens)}
  * @returns {String}
  */
 module.exports = (ctx, options) => {
+  const pagePathLevel = 1;
   const htmlOptions = {
-    pageTitle: options.manager.pageTitle,
+    pageIdentifier: 'admin',
+    pageTitle: options.manager.pageTitle + ' - Admin',
     logoUrl: options.manager.logoUrl,
     footerEntries: options.manager.footerEntries,
-    navLinks: [
-      {
-        text: 'Ticket',
-        href: 'ticket',
-      },
-    ],
   };
+  th.navLinks(pagePathLevel, ctx, htmlOptions);
+  sessionNavLinks(1, ctx, htmlOptions);
   const content = [
     mainContent(ctx),
   ];

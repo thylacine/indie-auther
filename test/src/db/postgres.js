@@ -349,7 +349,6 @@ describe('DatabasePostgres', function () {
     });
   }); // almanacUpsert
 
-
   describe('authenticationSuccess', function () {
     let identifier;
     beforeEach(function () {
@@ -419,6 +418,60 @@ describe('DatabasePostgres', function () {
       await assert.rejects(() => db.authenticationUpsert(dbCtx, identifier, credential), DBErrors.UnexpectedResult);
     });
   }); // authenticationUpsert
+
+  describe('authenticationUpdateCredential', function () {
+    let identifier, credential;
+    beforeEach(function () {
+      identifier = 'username';
+      credential = '$z$foo';
+    });
+    it('success', async function () {
+      const dbResult = {
+        rowCount: 1,
+        rows: undefined,
+        duration: 22,
+      };
+      sinon.stub(db.db, 'result').resolves(dbResult);
+      await db.authenticationUpdateCredential(dbCtx, identifier, credential);
+    });
+    it('failure', async function () {
+      credential = undefined;
+      const dbResult = {
+        rowCount: 0,
+        rows: undefined,
+        duration: 22,
+      };
+      sinon.stub(db.db, 'result').resolves(dbResult);
+      await assert.rejects(() => db.authenticationUpdateCredential(dbCtx, identifier, credential), DBErrors.UnexpectedResult);
+
+    });
+  }); // authenticationUpdateCredential
+
+  describe('authenticationUpdateOTPKey', function () {
+    let identifier, otpKey;
+    beforeEach(function () {
+      identifier = 'username';
+      otpKey = '1234567890123456789012';
+    });
+    it('success', async function () {
+      const dbResult = {
+        rowCount: 1,
+        rows: undefined,
+        duration: 22,
+      };
+      sinon.stub(db.db, 'result').resolves(dbResult);
+      await db.authenticationUpdateOTPKey(dbCtx, identifier, otpKey);
+    });
+    it('failure', async function () {
+      const dbResult = {
+        rowCount: 0,
+        rows: undefined,
+        duration: 22,
+      };
+      sinon.stub(db.db, 'result').resolves(dbResult);
+      await assert.rejects(() => db.authenticationUpdateOTPKey(dbCtx, identifier, otpKey), DBErrors.UnexpectedResult);
+    });
+  }); // authenticationUpdateOTPKey
 
   describe('profileIdentifierInsert', function () {
     let profile, identifier;

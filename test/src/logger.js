@@ -51,6 +51,32 @@ describe('Logger', function () {
     assert(logger.backend.info.args[0][0].includes('"********"'));
   });
 
+  it('masks noisy cookie header', function () {
+    logger.info('testScope', 'message', {
+      ctx: {
+        cookie: {
+          squeepSession: 'blahblahblahblahblah',
+        },
+      },
+    });
+    assert(logger.backend.info.called);
+    assert(logger.backend.info.args[0][0].includes('[scrubbed 20 bytes]'));
+  });
+
+  it('masks otp values', function () {
+    logger.info('teestScope', 'message', {
+      ctx: {
+        otpKey: '1234567890123456789012',
+        otpConfirmKey: '1234567890123456789012',
+        otpConfirmBox: 'xxxMysteryxxx',
+        otpState: 'xxxMysteryxxx',
+      }
+    });
+    assert(logger.backend.info.called);
+    assert(!logger.backend.info.args[0][0].includes('"1234567890123456789012"'));
+    assert(!logger.backend.info.args[0][0].includes('"xxxMysteryxxx"'));
+  });
+
   it('strips uninteresting scope dross', function () {
     logger.info('testScope', 'message', {
       ctx: {

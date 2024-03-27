@@ -21,7 +21,7 @@ const schemaVersionsSupported = {
   },
   max: {
     major: 1,
-    minor: 1,
+    minor: 2,
     patch: 0,
   },
 };
@@ -342,19 +342,53 @@ class DatabaseSQLite extends Database {
   }
 
 
-  authenticationUpsert(dbCtx, identifier, credential) {
+  authenticationUpsert(dbCtx, identifier, credential, otpKey) {
     const _scope = _fileScope('authenticationUpsert');
     const scrubbedCredential = '*'.repeat((credential || '').length);
-    this.logger.debug(_scope, 'called', { identifier, scrubbedCredential });
+    const scrubbedOTPKey = '*'.repeat((otpKey || '').length);
+    this.logger.debug(_scope, 'called', { identifier, scrubbedCredential, scrubbedOTPKey });
 
-    let result;
     try {
-      result = this.statement.authenticationUpsert.run({ identifier, credential });
+      const result = this.statement.authenticationUpsert.run({ identifier, credential, otpKey });
       if (result.changes != 1) {
         throw new DBErrors.UnexpectedResult('did not upsert authentication');
       }
     } catch (e) {
+      this.logger.error(_scope, 'failed', { error: e, identifier, scrubbedCredential, scrubbedOTPKey });
+      throw e;
+    }
+  }
+
+
+  authenticationUpdateCredential(dbCtx, identifier, credential) {
+    const _scope = _fileScope('authenticationUpdateCredential');
+    const scrubbedCredential = '*'.repeat((credential || '').length);
+    this.logger.debug(_scope, 'called', { identifier, scrubbedCredential });
+
+    try {
+      const result = this.statement.authenticationUpdateCredential.run({ identifier, credential });
+      if (result.changes != 1) {
+        throw new DBErrors.UnexpectedResult('did not update credential');
+      }
+    } catch (e) {
       this.logger.error(_scope, 'failed', { error: e, identifier, scrubbedCredential });
+      throw e;
+    }
+  }
+
+
+  authenticationUpdateOTPKey(dbCtx, identifier, otpKey) {
+    const _scope = _fileScope('authenticationUpdateOTPKey');
+    const scrubbedOTPKey = '*'.repeat((otpKey || '').length);
+    this.logger.debug(_scope, 'called', { identifier, scrubbedOTPKey });
+
+    try {
+      const result = this.statement.authenticationUpdateOtpKey.run({ identifier, otpKey });
+      if (result.changes != 1) {
+        throw new DBErrors.UnexpectedResult('did not update otpKey');
+      }
+    } catch (e) {
+      this.logger.error(_scope, 'failed', { error: e, identifier, scrubbedOTPKey });
       throw e;
     }
   }

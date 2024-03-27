@@ -1,6 +1,7 @@
 'use strict';
 
 const th = require('./template-helper');
+const { sessionNavLinks } = require('@squeep/authentication-module');
 
 function aboutSection() {
   return `
@@ -39,28 +40,22 @@ ${contactHTML}
  * @returns {String}
  */
 module.exports = (ctx, options) => {
+  const pagePathLevel = 0;
   const contactHTML = options.adminContactHTML;
   const htmlOptions = {
+    pageIdentifier: 'root',
     pageTitle: options.manager.pageTitle,
     logoUrl: options.manager.logoUrl,
     footerEntries: options.manager.footerEntries,
-    navLinks: [
-      {
-        text: 'Admin',
-        href: 'admin/',
-      },
-      {
-        text: 'Ticket',
-        href: 'admin/ticket',
-      },
-    ],
     headElements: [
       `<link rel="indieauth-metadata" href="${options.dingus.selfBaseUrl}${options.route.metadata}">`,
     ],
   };
+  th.navLinks(pagePathLevel, ctx, htmlOptions);
+  sessionNavLinks(pagePathLevel, ctx, htmlOptions);
   const content = [
     aboutSection(),
     contactSection(contactHTML),
   ];
-  return th.htmlPage(1, ctx, htmlOptions, content);
+  return th.htmlPage(pagePathLevel, ctx, htmlOptions, content);
 };

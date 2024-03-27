@@ -290,10 +290,35 @@ class Database {
    * @param {*} dbCtx
    * @param {String} identifier
    * @param {String} credential
+   * @param {String=} otpKey
    * @returns {Promise<void>}
    */
-  async authenticationUpsert(dbCtx, identifier, credential) {
+  async authenticationUpsert(dbCtx, identifier, credential, otpKey) {
     this._notImplemented('authenticationUpsert', arguments);
+  }
+
+
+  /**
+   * Update the otpKey for an identifier.
+   * @param {*} dbCtx
+   * @param {String} identifier
+   * @param {String=} otpKey
+   * @returns {Promise<void>}
+   */
+  async authenticationUpdateOTPKey(dbCtx, identifier, otpKey) {
+    this._notImplemented('authenticationUpdateOTPKey', arguments);
+  }
+
+
+  /**
+   * Update the credential for an identifier.
+   * @param {*} dbCtx
+   * @param {String} identifier
+   * @param {String} credential
+   * @returns {Promise<void>}
+   */
+  async authenticationUpdateCredential(dbCtx, identifier, credential) {
+    this._notImplemented('authenticationUpdateCredentials', arguments);
   }
 
 

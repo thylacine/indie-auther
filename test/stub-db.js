@@ -12,6 +12,8 @@ class StubDatabase extends Base {
       'authenticationGet',
       'authenticationSuccess',
       'authenticationUpsert',
+      'authenticationUpdateCredential',
+      'authenticationUpdateOTPKey',
       'profileIdentifierInsert',
       'profileIsValid',
       'profileScopeInsert',

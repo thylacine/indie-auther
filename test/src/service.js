@@ -106,6 +106,32 @@ describe('Service', function () {
     });
   }); // handlerGetAdminLogout
 
+  describe('handlerGetAdminSettings', function () {
+    it('covers authenticated', async function () {
+      service.authenticator.sessionRequiredLocal.resolves(true);
+      await service.handlerGetAdminSettings(req, res, ctx);
+      assert(service.sessionManager.getAdminSettings.called);
+    });
+    it('covers unauthenticated', async function () {
+      service.authenticator.sessionRequiredLocal.resolves(false);
+      await service.handlerGetAdminSettings(req, res, ctx);
+      assert(service.sessionManager.getAdminSettings.notCalled);
+    });
+  }); // handlerGetAdminSettings
+
+  describe('handlerPostAdminSettings', function () {
+    it('covers authenticated', async function () {
+      service.authenticator.sessionRequiredLocal.resolves(true);
+      await service.handlerPostAdminSettings(req, res, ctx);
+      assert(service.sessionManager.postAdminSettings.called);
+    });
+    it('covers unauthenticated', async function () {
+      service.authenticator.sessionRequiredLocal.resolves(false);
+      await service.handlerPostAdminSettings(req, res, ctx);
+      assert(service.sessionManager.postAdminSettings.notCalled);
+    });
+  }); // handlerPostAdminSettings
+
   describe('handlerGetAdmin', function () {
     it('covers authenticated', async function () {
       service.authenticator.sessionRequiredLocal.resolves(true);

@@ -1,7 +1,7 @@
 'use strict';
 
 const th = require('./template-helper');
-
+const { sessionNavLinks } = require('@squeep/authentication-module');
 
 /**
  * @param {Object} hApp
@@ -110,7 +110,7 @@ function renderScopeCheckboxLI(scope, checked) {
   }
   let profileClass;
   if (scope.profiles?.length) {
-    profileClass = ['profile-scope'].concat(scope.profiles.map((profile) => th.escapeCSS(profile))).join(' ');
+    profileClass = ['profile-scope'].concat(scope.profiles).join(' ');
   } else {
     profileClass = '';
   }
@@ -344,6 +344,7 @@ function mainContent(ctx, options) { // eslint-disable-line no-unused-vars
  * @returns {String}
  */
 module.exports = (ctx, options) => {
+  const pagePathLevel = 0;
   const htmlOptions = {
     pageTitle: `${options.manager.pageTitle} &mdash; Authorization Request`,
     logoUrl: options.manager.logoUrl,
@@ -357,22 +358,23 @@ function queryAll(query, fn) {
 }
 function profileSelected(element) {
   const profileClass = CSS.escape(element.value);
-  console.log('new profile:', element.value, profileClass);
-  queryAll('.profile-scope input', (n) => n.setAttribute('disabled', true));
+  // queryAll('.profile-scope input', (n) => n.setAttribute('disabled', ''));
   queryAll('.profile-scope', (n) => n.classList.add('disabled'));
   const profileQuery = '.profile-scope.' + profileClass;
-  queryAll(profileQuery + ' input', (n) => n.setAttribute('disabled', false));
+  // queryAll(profileQuery + ' input', (n) => n.removeAttribute('disabled'));
   queryAll(profileQuery, (n) => n.classList.remove('disabled'));
 }
 function onLoad() {
-  return; // The escaped class selection does not seem to work, so ignore it all for now.
   const profileSelect = document.getElementById('me');
   profileSelect.onchange = () => profileSelected(profileSelect);
   profileSelected(profileSelect);
 }
+window.onload = onLoad;
 </script>`,
     ],
   };
+  th.navLinks(pagePathLevel, ctx, htmlOptions);
+  sessionNavLinks(pagePathLevel, ctx, htmlOptions);
   const content = mainContent(ctx, options);
-  return th.htmlPage(0, ctx, htmlOptions, content);
+  return th.htmlPage(pagePathLevel, ctx, htmlOptions, content);
 };

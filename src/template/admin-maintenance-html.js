@@ -1,6 +1,7 @@
 'use strict';
 
 const th = require('./template-helper');
+const { sessionNavLinks } = require('@squeep/authentication-module');
 
 function renderAlmanacRow(entry) {
   const { event, date } = entry;
@@ -63,24 +64,18 @@ ${Object.entries(chores).map((chore) => renderChoreRow(...chore)).join('\n')}
  * @returns {String}
  */
 module.exports = (ctx, options) => {
+  const pagePathLevel = 1;
   const htmlOptions = {
+    pageIdentifier: 'maintenance',
     pageTitle: options.manager.pageTitle + ' - Maintenance',
     logoUrl: options.manager.logoUrl,
     footerEntries: options.manager.footerEntries,
-    navLinks: [
-      {
-        text: 'Admin',
-        href: '.',
-      },
-      {
-        text: 'Ticket',
-        href: './ticket',
-      },
-    ],
   };
+  th.navLinks(pagePathLevel, ctx, htmlOptions);
+  sessionNavLinks(pagePathLevel, ctx, htmlOptions);
   const content = [
     almanacSection(ctx.almanac || []),
     choresSection(ctx.chores || {}),
   ];
-  return th.htmlPage(1, ctx, htmlOptions, content);
+  return th.htmlPage(pagePathLevel, ctx, htmlOptions, content);
 };
