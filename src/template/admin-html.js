@@ -11,26 +11,26 @@ const { sessionNavLinks } = require('@squeep/authentication-module');
 
 
 function renderProfileLI(profile) {
-  return `\t<li><a class="uri" name="${profile}">${profile}</a></li>`;
+  return `\t<li><a class="uri" id="${profile}">${profile}</a></li>`;
 }
 
 
 function renderProfileScopeIndicator(profile, scope, selected) {
   const checked = selected ? ' checked' : '';
   return `\t\t<td>
-\t\t\t<input type="checkbox" id="${profile}-${scope}" name="scopes-${profile}" value="${scope}"${checked}>
+\t\t\t<input type="checkbox" id="${profile}-${scope}" name="scopes-${profile}[]" value="${scope}"${checked}>
 \t\t</td>`;
 }
 
 function renderScopeRow(scope, details, profiles) {
   return `\t<tr class="scope">
 ${(profiles || []).map((profile) => renderProfileScopeIndicator(profile, scope, details.profiles.includes(profile))).join('\n')}
-\t\t<th scope="row"><label>${scope}<label></th>
+\t\t<th scope="row"><label>${scope}</label></th>
 \t\t<td class="description">${details.description}</td>
 \t\t<td>${details.application}</td>
 \t\t<td class="scope-actions">` +
     (details.isManuallyAdded ? `
-\t\t\t<button name="action" value="delete-scope-${encodeURIComponent(scope)}">Delete</button>
+\t\t\t<button type="submit" name="action" value="delete-scope-${encodeURIComponent(scope)}">Delete</button>
 ` : '') + `
 \t\t</td>
 \t</tr>`;
@@ -38,7 +38,7 @@ ${(profiles || []).map((profile) => renderProfileScopeIndicator(profile, scope, 
 
 
 function renderProfileHeader(profile) {
-  return `<th class="vertical uri">
+  return `<th scope="col" class="vertical uri">
 \t\t${profile}
 </th>`;
 }
@@ -49,10 +49,10 @@ function scopeIndexTable(scopeIndex, profiles) {
 <thead>
 \t<tr>
 ${(profiles || []).map((profile) => renderProfileHeader(profile)).join('\n')}
-\t\t<th>Scope</th>
-\t\t<th>Description</th>
-\t\t<th>Application</th>
-\t\t<th class="scope-actions"></th>
+\t\t<th scope="col">Scope</th>
+\t\t<th scope="col">Description</th>
+\t\t<th scope="col">Application</th>
+\t\t<th scope="col" class="scope-actions"></th>
 \t</tr>
 </thead>
 <tbody>
@@ -86,47 +86,50 @@ function renderTokenRow(token) {
 <td>${token.resource ? token.resource : ''}</td>
 \t\t\t<td>` + (
     token.isRevoked ? '' : `
-\t\t\t\t<button name="action" value="revoke-${token.codeId}">Revoke</button>`) + `
+\t\t\t\t<button type="submit" name="action" value="revoke-${token.codeId}">Revoke</button>`) + `
 \t\t\t</td>
 \t\t</tr>`;
 }
 
 function noTokensRows() {
   return [`\t\t<tr>
-\t\t\t<td colspan="100%" class="centered">(No active or recent tokens.)</td>
+\t\t\t<td colspan="10" class="centered">(No active or recent tokens.)</td>
 \t\t</tr>`];
 }
 
 function tokenTable(tokens) {
   const tokenRows = tokens?.length ? tokens.map((token) => renderTokenRow(token)) : noTokensRows();
-  return `<table>
+  const formOpen = tokens?.length ? '<form method="POST">\n' : '';
+  const formClose = tokens?.length ? '\n</form>' : '';
+  return `${formOpen}<table>
 \t<thead>
 \t\t<tr>
-<th>Type</th>
-\t\t\t<th>Client Identifier / Ticket Subject</th>
-\t\t\t<th>Profile</th>
-<th>Scopes</th>
-\t\t\t<th>Code</th>
-\t\t\t<th>Created or Refreshed</th>
-\t\t\t<th>Expires</th>
-\t\t\t<th>Revoked</th>
-<th>Resource</th>
-\t\t\t<th></th>
+\t\t\t<th scope="col">Type</th>
+\t\t\t<th scope="col">Client Identifier / Ticket Subject</th>
+\t\t\t<th scope="col">Profile</th>
+\t\t\t<th scope="col">Scopes</th>
+\t\t\t<th scope="col">Code</th>
+\t\t\t<th scope="col">Created or Refreshed</th>
+\t\t\t<th scope="col">Expires</th>
+\t\t\t<th scope="col">Revoked</th>
+\t\t\t<th scope="col">Resource</th>
+\t\t\t<th scope="col"></th>
 \t\t</tr>
 \t</thead>
 \t<tbody>
 ${tokenRows.join('\n')}
 \t</tbody>
-</table>`;
+</table>${formClose}`;
 }
 
 function mainContent(ctx) {
+  const profileList = (ctx.profilesScopes?.profiles || []).map((p) => renderProfileLI(p)).join('\n');
   return `<section>
 \t<h2>Profiles</h2>
 \t<ul>
-\t${(ctx.profilesScopes?.profiles || []).map((p) => renderProfileLI(p)).join('\n')}
+${profileList}
 \t</ul>
-\t<form action="" method="POST">
+\t<form method="POST">
 \t\t<fieldset>
 \t\t\t<legend>Add New Profile</legend>
 \t\t\t<div>
@@ -136,17 +139,17 @@ function mainContent(ctx) {
 \t\t\t<br>
 \t\t\t<label for="profile">Profile URL:</label>
 \t\t\t<input type="url" id="profile" name="profile" size="96">
-\t\t\t<button name="action" value="new-profile">Add Profile</button>
+\t\t\t<button type="submit" name="action" value="new-profile">Add Profile</button>
 \t\t</fieldset>
 \t</form>
 </section>
 <section>
 \t<h2>Scopes</h2>
-\t<form action="" method="POST">
 \t\t<details>
-\t\t<summary>
-\t\tScopes Associated with Profiles for Convenience
-\t\t</summary>
+\t\t\t<summary>
+\t\t\t\tScopes Associated with Profiles for Convenience
+\t\t\t</summary>
+\t\t<form method="POST">
 \t\t\t<fieldset>
 \t\t\t\t<legend>Manage Additional Profile Scope Availability</legend>
 \t\t\t\t<div>
@@ -155,12 +158,12 @@ function mainContent(ctx) {
 \t\t\t\t\tAny scope not in this table or not selected for a profile can always be added in the ad hoc field on the authorization request.
 \t\t\t\t</div>
 \t\t\t\t<br>
-\t\t${scopeIndexTable(ctx.profilesScopes.scopeIndex, ctx.profilesScopes.profiles)}
-\t\t\t\t<button name="action" value="save-scopes">Save</button>
+${scopeIndexTable(ctx.profilesScopes.scopeIndex, ctx.profilesScopes.profiles)}
+\t\t\t\t<button type="submit" name="action" value="save-scopes">Save</button>
 \t\t\t</fieldset>
 \t\t</form>
 \t\t<br>
-\t\t<form action="" method="POST">
+\t\t<form method="POST">
 \t\t\t<fieldset>
 \t\t\t\t<legend>Add New Scope</legend>
 \t\t\t\t<label for="scope">Scope:</label>
@@ -169,16 +172,14 @@ function mainContent(ctx) {
 \t\t\t\t<input type="text" id="description" name="description">
 \t\t\t\t<label for="application">Application:</label>
 \t\t\t\t<input type="text" id="application" name="application">
-\t\t\t\t<button name="action" value="new-scope">Add Scope</button>
+\t\t\t\t<button type="submit" name="action" value="new-scope">Add Scope</button>
 \t\t\t</fieldset>
+\t\t</form>
 \t\t</details>
-\t</form>
 </section>
 <section>
 \t<h2>Tokens</h2>
-\t<form action="" method="POST">
 ${tokenTable(ctx.tokens)}
-\t</form>
 </section>`;
 }
 

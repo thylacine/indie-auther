@@ -5,15 +5,19 @@ const assert = require('assert');
 const template = require('../../../src/template/authorization-request-html');
 const Config = require('../../../config');
 const StubLogger = require('../../stub-logger');
-const lint = require('html-minifier-lint').lint; // eslint-disable-line node/no-unpublished-require
+const { makeHtmlLint } = require('@squeep/html-template-helper');
+const { HtmlValidate } = require('html-validate');
 
 const stubLogger = new StubLogger();
-
-function lintHtml(html) {
-  const result = lint(html);
-  stubLogger.debug('validHtml', '', { result, html });
-  assert(!result);
-}
+const htmlValidate = new HtmlValidate({
+  extends: [
+    'html-validate:recommended',
+  ],
+  rules: {
+    'valid-id': ['error', { relaxed: true }], // allow profile uri to be component of id
+  },
+});
+const lintHtml = makeHtmlLint(stubLogger, htmlValidate);
 
 describe('Authorization Request HTML Template', function () {
   let ctx, config;
@@ -21,12 +25,12 @@ describe('Authorization Request HTML Template', function () {
     ctx = {};
     config = new Config('test');
   });
-  it('renders', function () {
+  it('renders', async function () {
     const result = template(ctx, config);
-    lintHtml(result);
+    await lintHtml(result);
     assert(result);
   });
-  it('covers options', function () {
+  it('covers options', async function () {
     ctx.session = {
       scope: ['profile', 'email'],
       scopeIndex: {
@@ -58,10 +62,10 @@ describe('Authorization Request HTML Template', function () {
       redirectUri: 'https://client.example.com/app/_return',
     };
     const result = template(ctx, config);
-    lintHtml(result);
+    await lintHtml(result);
     assert(result);
   });
-  it('covers alternate scopes and client logo', function () {
+  it('covers alternate scopes and client logo', async function () {
     ctx.session = {
       scope: ['profile', 'email'],
       scopeIndex: {
@@ -100,10 +104,10 @@ describe('Authorization Request HTML Template', function () {
       redirectUri: 'https://client.example.com/app/_return',
     };
     const result = template(ctx, config);
-    lintHtml(result);
+    await lintHtml(result);
     assert(result);
   });
-  it('covers partial data', function () {
+  it('covers partial data', async function () {
     ctx.session = {
       scope: ['profile', 'email', 'create'],
       profiles: ['https://another.example.com/profile', 'https://example.com/profile'],
@@ -122,10 +126,10 @@ describe('Authorization Request HTML Template', function () {
       redirectUri: 'https://client.example.com/app/_return',
     };
     const result = template(ctx, config);
-    lintHtml(result);
+    await lintHtml(result);
     assert(result);
   });
-  it('covers partial data', function () {
+  it('covers partial data', async function () {
     ctx.session = {
       scope: ['profile', 'email', 'create'],
       profiles: [],
@@ -138,7 +142,7 @@ describe('Authorization Request HTML Template', function () {
       redirectUri: 'https://client.example.com/app/_return',
     };
     const result = template(ctx, config);
-    lintHtml(result);
+    await lintHtml(result);
     assert(result);
   });
 }); // Authorization Request HTML Template

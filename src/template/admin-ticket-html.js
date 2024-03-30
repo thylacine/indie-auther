@@ -16,7 +16,7 @@ function renderScopeCheckboxTR(scope) {
   const defaultChecked = ['read'];
   const checked = defaultChecked.includes(scope) ? ' checked' : '';
   return `<tr class="scope">
-\t<td><input type="checkbox" id="scopes-${scope}" name="scopes" value="${scope}"${checked}></td>
+\t<td><input type="checkbox" id="scopes-${scope}" name="scopes[]" value="${scope}"${checked}></td>
 \t<td>${scope}</td>
 </tr>`;
 }
@@ -27,10 +27,10 @@ function mainContent(ctx) {
   const elideScopes = ['profile', 'email'];
   const allScopes = Object.keys(ctx?.profilesScopes?.scopeIndex || {});
   const displayScopes = (allScopes).filter((scope) => !elideScopes.includes(scope));
-  const scopesCheckboxRows = th.indented(4, displayScopes.map((scope) => renderScopeCheckboxTR(scope)))
+  const scopesCheckboxRows = th.indented(5, displayScopes.map((scope) => renderScopeCheckboxTR(scope)))
     .join('\n');
   return `<section>
-\t<form action="" method="POST">
+\t<form method="POST">
 \t\t<div>
 \t\t\tYou may proactively send a ticket to a third-party site,
 \t\t\twhich they may redeem for an access token which grants additional
@@ -53,14 +53,16 @@ ${profileOptions}
 <fieldset>
 <legend>Scopes</legend>
 \t\t\t<table>
+\t\t\t\t<tbody>
 ${scopesCheckboxRows}
+\t\t\t\t</tbody>
 \t\t\t</table>
 </fieldset>
 \t\t\t<br>
 \t\t\t<label for="scopes-adhoc">Additional Scopes (space separated):</label>
 \t\t\t<input type="text" id="scopes-adhoc" name="adhoc" size="96">
 \t\t\t<br>
-\t\t\t<button name="action" value="proffer-ticket">Send Ticket</button>
+\t\t\t<button type="submit" name="action" value="proffer-ticket">Send Ticket</button>
 \t\t</fieldset>
 \t</form>
 </section>`;

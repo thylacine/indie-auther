@@ -5,15 +5,12 @@ const assert = require('assert');
 const template = require('../../../src/template/admin-ticket-html');
 const Config = require('../../../config');
 const StubLogger = require('../../stub-logger');
-const lint = require('html-minifier-lint').lint; // eslint-disable-line node/no-unpublished-require
+const { makeHtmlLint } = require('@squeep/html-template-helper');
+const { HtmlValidate } = require('html-validate');
 
 const stubLogger = new StubLogger();
-
-function lintHtml(html) {
-  const result = lint(html);
-  stubLogger.debug('validHtml', '', { result, html });
-  assert(!result);
-}
+const htmlValidate = new HtmlValidate();
+const lintHtml = makeHtmlLint(stubLogger, htmlValidate);
 
 describe('Admin Ticket HTML Template', function () {
   let ctx, config;
@@ -73,15 +70,15 @@ describe('Admin Ticket HTML Template', function () {
     };
     config = new Config('test');
   });
-  it('renders', function () {
+  it('renders', async function () {
     const result = template(ctx, config);
-    lintHtml(result);
+    await lintHtml(result);
     assert(result);
   });
-  it('covers branches', function () {
+  it('covers branches', async function () {
     delete ctx.profilesScopes;
     const result = template(ctx, config);
-    lintHtml(result);
+    await lintHtml(result);
     assert(result);
   });
 }); // Admin Ticket HTML Template

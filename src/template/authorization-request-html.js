@@ -116,7 +116,7 @@ function renderScopeCheckboxLI(scope, checked) {
   }
   return `
         <li class="${profileClass}">
-          <input type="checkbox" id="scope_${scope.scope}" name="accepted_scopes" value="${scope.scope}"${checked ? ' checked' : ''}>
+          <input type="checkbox" id="scope_${scope.scope}" name="accepted_scopes[]" value="${scope.scope}"${checked ? ' checked' : ''}>
           <label for="scope_${scope.scope}">${scope.scope}</label>${scopeDescription}
         </li>`;
 }
@@ -165,7 +165,7 @@ ${additionalScopes.map((scopeDetails) => renderScopeCheckboxLI(scopeDetails, fal
       You may also specify a space-separated list of any additional ad hoc scopes you would like to associate with this authorization request, which were not explicitly requested by the client application.
     </div>
     <label for="ad-hoc-scopes">Ad Hoc Scopes</label>
-    <input id="ad-hoc-scopes" name="ad_hoc_scopes" value="">
+    <input type="text" id="ad-hoc-scopes" name="ad_hoc_scopes" value="">
   </fieldset>`);
   return parts.join('');
 }
@@ -189,18 +189,10 @@ function renderExpiration(requestedScopes) {
 \t\t<br>
 \t\t<details>
 \t\t\t<summary>Set Expiration</summary>
-\t\t\t<div>
 \t\t\t\t${radioButton('expires', 'never', 'Never', true)}
-\t\t\t</div>
-\t\t\t<div>
 \t\t\t\t${radioButton('expires', '1d', '1 Day')}
-\t\t\t</div>
-\t\t\t<div>
 \t\t\t\t${radioButton('expires', '1w', '1 Week')}
-\t\t\t</div>
-\t\t\t<div>
 \t\t\t\t${radioButton('expires', '1m', '1 Month')}
-\t\t\t</div>
 \t\t\t<div>
 \t\t\t\t${radioButton('expires', 'custom', 'Other:')}
 \t\t\t\t<input type="number" id="expires-seconds" name="expires-seconds">
@@ -210,22 +202,15 @@ function renderExpiration(requestedScopes) {
 \t\t\t<div>
 \t\t\t\tTokens with expirations may be allowed to be renewed for a fresh token for an amount of time after they expire.
 \t\t\t</div>
-\t\t\t<div>
 \t\t\t\t${radioButton('refresh', 'none', 'Not Refreshable', true)}
-\t\t\t</div>
-\t\t\t<div>
 \t\t\t\t${radioButton('refresh', '1d', '1 Day')}
-\t\t\t</div>
-\t\t\t<div>
 \t\t\t\t${radioButton('refresh', '1w', '1 Week')}
-\t\t\t</div>
-\t\t\t<div>
 \t\t\t\t${radioButton('refresh', '1m', '1 Month')}
 \t\t\t<div>
 \t\t\t\t${radioButton('refresh', 'custom', 'Other:')}
 \t\t\t\t<input type="number" id="refresh-seconds" name="refresh-seconds">
 \t\t\t\t<label for="refresh-seconds">seconds</label>
-\t\t\t </div>
+\t\t\t</div>
 \t\t</details>
 \t</fieldset>`;
 }
@@ -298,9 +283,7 @@ function mainContent(ctx, options) { // eslint-disable-line no-unused-vars
 
   return [
     `<section class="information">
-\tThe application client
-\t${renderClientIdentifier(session.clientIdentifier)}
-\tat <a class="uri" name="${session.clientId}">${session.clientId}</a> would like to identify you as <a class="uri" name="${hintedProfile}">${hintedProfile}</a>.
+\tThe application client ${renderClientIdentifier(session.clientIdentifier)} at <a class="uri" aria-label="client-identifier" id="${session.clientId}">${session.clientId}</a> would like to identify you as <a class="uri" aria-label="profile"${hintedProfile ? ' id="' + hintedProfile + '"' : ''}>${hintedProfile ? hintedProfile : '(unspecified)'}</a>.
 </section>
 <section class="choices">
 \t<form action="consent" method="POST" class="form-consent">`,
@@ -312,14 +295,14 @@ function mainContent(ctx, options) { // eslint-disable-line no-unused-vars
 \t\t<br>
 \t\t<fieldset>
 \t\t\t<legend>Do you want to allow this?</legend>
-\t\t\t<button class="button-accept" name="accept" value="true">Accept</button>
-\t\t\t<button class="button-decline" name="accept" value="false">Decline</button>
+\t\t\t<button type="submit" class="button-accept" name="accept" value="true">Accept</button>
+\t\t\t<button type="submit" class="button-decline" name="accept" value="false">Decline</button>
 \t\t</fieldset>
 \t\t<input type="hidden" name="session" value="${session.persist}">
 \t</form>
 \t<br>
 \t<div>
-\t\tYou will be redirected to <a class="uri" name="${session.redirectUri}">${session.redirectUri}</a>.
+\t\tYou will be redirected to <a class="uri" id="${session.redirectUri ? session.redirectUri : 'unknown-redirect'}">${session.redirectUri}</a>.
 \t</div>
 </section>`,
   ];

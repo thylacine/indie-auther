@@ -536,7 +536,7 @@ class Manager {
     const acceptedScopesSet = new Set();
     const rejectedScopesSet = new Set();
 
-    const submittedScopes = common.ensureArray(ctx.parsedBody['accepted_scopes'])
+    const submittedScopes = common.ensureArray(ctx.parsedBody['accepted_scopes[]'])
       .concat((ctx.parsedBody['ad_hoc_scopes'] || '').split(scopeSplitRE));
     submittedScopes.forEach((scope) => {
       if (scope) {
@@ -617,7 +617,7 @@ class Manager {
    * Receives POST request from consent page, expecting these form fields:
    *   session - encrypted data collected from initial auth call
    *   accept - 'true' if consent was granted
-   *   accepted_scopes - list of scopes to grant
+   *   accepted_scopes[] - list of scopes to grant
    *   ad_hoc_scopes - additional scopes specified by user
    *   me - selected profile to identify as
    *   expires - optional lifespan
@@ -1835,16 +1835,16 @@ class Manager {
 
       if (action === 'save-scopes') {
         // Update the convenience scopes set for profiles.
-        // Expect 'scopes-<profile>' with value of array of scopes
+        // Expect 'scopes-<profile>[]' with value of array of scopes
         const profileKeys = ctx.parsedBody && Object.keys(ctx.parsedBody)
-          .filter((k) => k.startsWith('scopes-'));
+          .filter((k) => k.startsWith('scopes-') && k.endsWith('[]'));
         try {
           await this.db.transaction(dbCtx, async (txCtx) => {
             await Promise.all(
               /* For each scopes-profile submitted, set those. */
               profileKeys.map((profileKey) => {
-                /* elide 'scope-' prefix to get the profile */
-                const profile = profileKey.slice(7);
+                /* elide 'scope-' prefix and '[]' postfix to get the profile */
+                const profile = profileKey.slice(7, -2);
                 /* (should validate profile here) */
 
                 /* remove invalid scopes from submitted list */
@@ -2013,7 +2013,7 @@ class Manager {
 
         const scopesSet = new Set();
         const rawScopes = [
-          ...(common.ensureArray(ctx.parsedBody['scopes'])),
+          ...(common.ensureArray(ctx.parsedBody['scopes[]'])),
           ...((ctx.parsedBody['adhoc'] || '').split(scopeSplitRE)),
         ].filter((scope) => scope);
         rawScopes.forEach((scope) => {

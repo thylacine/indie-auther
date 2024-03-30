@@ -16,13 +16,15 @@ function almanacSection(almanac) {
 \t<h2>Almanac</h2>
 \t<table>
 \t\t<thead>
-\t\t\t<th>Event</th>
-\t\t\t<th>Date</th>
+\t\t\t\t<tr>
+\t\t\t\t<th scope="col">Event</th>
+\t\t\t\t<th scope="col">Date</th>
+\t\t\t</tr>
 \t\t</thead>
 \t\t<tbody>
 ${almanac.map((entry) => renderAlmanacRow(entry)).join('\n')}
 \t\t</tbody>
-\t<table>
+\t</table>
 </section>`;
 }
 
@@ -40,14 +42,16 @@ function choresSection(chores) {
 \t<h2>Chores</h2>
 \t<table>
 \t\t<thead>
-\t\t\t<th>Chore</th>
-\t\t\t<th>Frequency</th>
-\t\t\t<th>Next Run</th>
+\t\t\t<tr>
+\t\t\t\t<th scope="col">Chore</th>
+\t\t\t\t<th scope="col">Frequency</th>
+\t\t\t\t<th scope="col">Next Run</th>
+\t\t\t</tr>
 \t\t</thead>
 \t\t<tbody>
 ${Object.entries(chores).map((chore) => renderChoreRow(...chore)).join('\n')}
 \t\t</tbody>
-\t<table>
+\t</table>
 </section>`;
 }
 

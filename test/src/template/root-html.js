@@ -5,15 +5,12 @@ const assert = require('assert');
 const template = require('../../../src/template/root-html');
 const Config = require('../../../config');
 const StubLogger = require('../../stub-logger');
-const lint = require('html-minifier-lint').lint; // eslint-disable-line node/no-unpublished-require
+const { makeHtmlLint } = require('@squeep/html-template-helper');
+const { HtmlValidate } = require('html-validate');
 
 const stubLogger = new StubLogger();
-
-function lintHtml(html) {
-  const result = lint(html);
-  stubLogger.debug('validHtml', '', { result, html });
-  assert(!result);
-}
+const htmlValidate = new HtmlValidate();
+const lintHtml = makeHtmlLint(stubLogger, htmlValidate);
 
 describe('Root HTML Template', function () {
   let ctx, config;
@@ -21,15 +18,15 @@ describe('Root HTML Template', function () {
     ctx = {};
     config = new Config('test');
   });
-  it('renders', function () {
+  it('renders', async function () {
     const result = template(ctx, config);
-    lintHtml(result);
+    await lintHtml(result);
     assert(result);
   });
-  it('covers options', function () {
+  it('covers options', async function () {
     config.adminContactHTML = '<div>support</div>';
     const result = template(ctx, config);
-    lintHtml(result);
+    await lintHtml(result);
     assert(result);
   });
 }); // Root HTML Template

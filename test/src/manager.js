@@ -904,7 +904,7 @@ describe('Manager', function () {
       assert.deepStrictEqual(result, []);
     });
     it('filters invalid scopes', function () {
-      ctx.parsedBody['accepted_scopes'] = ['read', 'email'];
+      ctx.parsedBody['accepted_scopes[]'] = ['read', 'email'];
       ctx.parsedBody['ad_hoc_scopes'] = 'bad"scope  create ';
       const result = manager._parseConsentScopes(ctx);
       assert.deepStrictEqual(result, ['read', 'create']);
@@ -1013,12 +1013,12 @@ describe('Manager', function () {
       assert(ctx.session.error);
     });
     it('removes email scope without profile', async function () {
-      ctx.parsedBody['accepted_scopes'] = ['email', 'create'];
+      ctx.parsedBody['accepted_scopes[]'] = ['email', 'create'];
       await manager.postConsent(res, ctx);
       assert(!ctx.session.acceptedScopes.includes('email'));
     });
     it('merges valid ad-hoc scopes', async function () {
-      ctx.parsedBody['accepted_scopes'] = ['email', 'create'];
+      ctx.parsedBody['accepted_scopes[]'] = ['email', 'create'];
       ctx.parsedBody['ad_hoc_scopes'] = '  my:scope  "badScope';
       await manager.postConsent(res, ctx);
       assert(ctx.session.acceptedScopes.includes('my:scope'));
@@ -2052,7 +2052,7 @@ describe('Manager', function () {
     describe('save-scopes action', function () {
       beforeEach(function () {
         ctx.parsedBody['action'] = 'save-scopes';
-        ctx.parsedBody['scopes-https://profile/example.com/'] = ['scope1', 'scope2'];
+        ctx.parsedBody['scopes-https://profile/example.com/[]'] = ['scope1', 'scope2'];
       });
       it('covers saving scopes', async function () {
         await manager.postAdmin(res, ctx);
@@ -2210,7 +2210,7 @@ describe('Manager', function () {
   describe('postAdminTicket', function () {
     beforeEach(function () {
       ctx.parsedBody['action'] = 'proffer-ticket';
-      ctx.parsedBody['scopes'] = ['read', 'role:private'];
+      ctx.parsedBody['scopes[]'] = ['read', 'role:private'];
       ctx.parsedBody['adhoc'] = 'adhoc_scope';
       ctx.parsedBody['profile'] = 'https://profile.example.com/';
       ctx.parsedBody['resource'] = 'https://profile.example.com/feed';
@@ -2234,7 +2234,7 @@ describe('Manager', function () {
       ctx.parsedBody['profile'] = 'bad url';
       ctx.parsedBody['resource'] = 'bad url';
       ctx.parsedBody['subject'] = 'bad url';
-      ctx.parsedBody['scopes'] = ['fl"hrgl', 'email'];
+      ctx.parsedBody['scopes[]'] = ['fl"hrgl', 'email'];
       await manager.postAdminTicket(res, ctx);
       assert(res.end.called);
       assert.strictEqual(ctx.errors.length, 5);
