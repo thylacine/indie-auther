@@ -3,7 +3,7 @@ digraph indieAutherERD {
 		rankdir=LR,
 		overlap=false,
 		splines=true,
-		label="IndieAuther Entity-Relations\nPostgres\nSchema 1.1.0",
+		label="IndieAuther Entity-Relations\nPostgres\nSchema 1.2.0",
 		labelloc="t",
 		fontsize=26,
 	];

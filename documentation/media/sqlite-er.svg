@@ -10,7 +10,7 @@
 <title>indieAutherERD</title>
 <polygon fill="white" stroke="transparent" points="-4,4 -4,-636 665,-636 665,4 -4,4"/>
 <text text-anchor="middle" x="330.5" y="-607.2" font-family="Times,serif" font-size="26.00">IndieAuther Entity&#45;RelationsSQLite</text>
-<text text-anchor="middle" x="330.5" y="-578.2" font-family="Times,serif" font-size="26.00">Schema 1.1.0</text>
+<text text-anchor="middle" x="330.5" y="-578.2" font-family="Times,serif" font-size="26.00">Schema 1.2.0</text>
 <!-- redeemed_ticket -->
 <g id="node1" class="node">
 <title>redeemed_ticket</title>
