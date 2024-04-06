@@ -84,7 +84,7 @@ ${scopesCheckboxRows}
 module.exports = (ctx, options) => {
   const pagePathLevel = 1;
   const htmlOptions = {
-    padeIdentifier: 'ticketProffer',
+    pageIdentifier: 'ticketProffer',
     pageTitle: options.manager.pageTitle + ' - Ticket Proffer',
     logoUrl: options.manager.logoUrl,
     footerEntries: options.manager.footerEntries,
