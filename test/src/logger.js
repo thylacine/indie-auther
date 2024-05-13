@@ -1,8 +1,8 @@
-/* eslint-env mocha */
+/* eslint-disable sonarjs/no-duplicate-string */
 'use strict';
 
 const assert = require('assert');
-const sinon = require('sinon'); // eslint-disable-line node/no-unpublished-require
+const sinon = require('sinon');
 const Logger = require('../../src/logger');
 const Config = require('../../config');
 
@@ -70,7 +70,7 @@ describe('Logger', function () {
         otpConfirmKey: '1234567890123456789012',
         otpConfirmBox: 'xxxMysteryxxx',
         otpState: 'xxxMysteryxxx',
-      }
+      },
     });
     assert(logger.backend.info.called);
     assert(!logger.backend.info.args[0][0].includes('"1234567890123456789012"'));

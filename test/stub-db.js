@@ -1,7 +1,6 @@
-/* eslint-disable security/detect-object-injection */
 'use strict';
 
-const { StubDatabase: Base } = require('@squeep/test-helper'); // eslint-disable-line node/no-unpublished-require
+const { StubDatabase: Base } = require('@squeep/test-helper');
 
 class StubDatabase extends Base {
   get _stubFns() {

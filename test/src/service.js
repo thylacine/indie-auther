@@ -1,10 +1,8 @@
-/* eslint-env mocha */
-/* eslint-disable capitalized-comments */
-
+/* eslint-disable sonarjs/no-duplicate-string */
 'use strict';
 
 const assert = require('assert');
-const sinon = require('sinon'); // eslint-disable-line node/no-unpublished-require
+const sinon = require('sinon');
 const { AsyncLocalStorage } = require('node:async_hooks');
 
 const StubDb = require('../stub-db');

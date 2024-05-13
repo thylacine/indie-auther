@@ -9,13 +9,16 @@ const path = require('path');
 const { Dingus } = require('@squeep/api-dingus');
 const common = require('./common');
 const Manager = require('./manager');
-const { Authenticator, SessionManager } = require('@squeep/authentication-module');
-const { ResourceAuthenticator } = require('@squeep/resource-authentication-module');
+const { Authenticator, ResourceAuthenticator, SessionManager } = require('@squeep/authentication-module');
 const { initContext, navLinks } = require('./template/template-helper');
 const Enum = require('./enum');
 const { ResponseError } = require('./errors');
 
 const _fileScope = common.fileScope(__filename);
+
+/**
+ * @typedef {import('node:http')} http
+ */
 
 class Service extends Dingus {
   constructor(logger, db, options, asyncLocalStorage) {
@@ -103,9 +106,9 @@ class Service extends Dingus {
 
   /**
    * Do a little more on each request.
-   * @param {http.IncomingMessage} req
-   * @param {http.ServerResponse} res
-   * @param {Object} ctx
+   * @param {http.IncomingMessage} req request
+   * @param {http.ServerResponse} res response
+   * @param {object} ctx context
    */
   async preHandler(req, res, ctx) {
     const _scope = _fileScope('preHandler');
@@ -125,9 +128,9 @@ class Service extends Dingus {
 
 
   /**
-   * @param {http.IncomingMessage} req
-   * @param {http.ServerResponse} res
-   * @param {Object} ctx
+   * @param {http.IncomingMessage} req request
+   * @param {http.ServerResponse} res response
+   * @param {object} ctx context
    */
   async handlerGetAdminLogin(req, res, ctx) {
     const _scope = _fileScope('handlerGetAdminLogin');
@@ -142,9 +145,9 @@ class Service extends Dingus {
 
 
   /**
-   * @param {http.IncomingMessage} req
-   * @param {http.ServerResponse} res
-   * @param {Object} ctx
+   * @param {http.IncomingMessage} req request
+   * @param {http.ServerResponse} res response
+   * @param {object} ctx context
    */
   async handlerPostAdminLogin(req, res, ctx) {
     const _scope = _fileScope('handlerPostAdminLogin');
@@ -163,9 +166,9 @@ class Service extends Dingus {
 
 
   /**
-   * @param {http.IncomingMessage} req
-   * @param {http.ServerResponse} res
-   * @param {Object} ctx
+   * @param {http.IncomingMessage} req request
+   * @param {http.ServerResponse} res response
+   * @param {object} ctx context
    */
   async handlerGetAdminSettings(req, res, ctx) {
     const _scope = _fileScope('handlerGetAdminSettings');
@@ -182,9 +185,9 @@ class Service extends Dingus {
 
 
   /**
-   * @param {http.IncomingMessage} req
-   * @param {http.ServerResponse} res
-   * @param {Object} ctx
+   * @param {http.IncomingMessage} req request
+   * @param {http.ServerResponse} res response
+   * @param {object} ctx context
    */
   async handlerPostAdminSettings(req, res, ctx) {
     const _scope = _fileScope('handlerPostAdminSettings');
@@ -202,9 +205,9 @@ class Service extends Dingus {
 
 
   /**
-   * @param {http.IncomingMessage} req
-   * @param {http.ServerResponse} res
-   * @param {Object} ctx
+   * @param {http.IncomingMessage} req request
+   * @param {http.ServerResponse} res response
+   * @param {object} ctx context
    */
   async handlerGetAdminLogout(req, res, ctx) {
     const _scope = _fileScope('handlerGetAdminLogout');
@@ -221,9 +224,9 @@ class Service extends Dingus {
 
 
   /**
-   * @param {http.IncomingMessage} req
-   * @param {http.ServerResponse} res
-   * @param {Object} ctx
+   * @param {http.IncomingMessage} req request
+   * @param {http.ServerResponse} res response
+   * @param {object} ctx context
    */
   async handlerGetAdmin(req, res, ctx) {
     const _scope = _fileScope('handlerGetAdmin');
@@ -240,9 +243,9 @@ class Service extends Dingus {
 
 
   /**
-   * @param {http.IncomingMessage} req
-   * @param {http.ServerResponse} res
-   * @param {Object} ctx
+   * @param {http.IncomingMessage} req request
+   * @param {http.ServerResponse} res response
+   * @param {object} ctx context
    */
   async handlerPostAdmin(req, res, ctx) {
     const _scope = _fileScope('handlerPostAdmin');
@@ -260,9 +263,9 @@ class Service extends Dingus {
 
 
   /**
-   * @param {http.IncomingMessage} req
-   * @param {http.ServerResponse} res
-   * @param {Object} ctx
+   * @param {http.IncomingMessage} req request
+   * @param {http.ServerResponse} res response
+   * @param {object} ctx context
    */
   async handlerGetAdminTicket(req, res, ctx) {
     const _scope = _fileScope('handlerGetAdminTicket');
@@ -279,9 +282,9 @@ class Service extends Dingus {
 
 
   /**
-   * @param {http.IncomingMessage} req
-   * @param {http.ServerResponse} res
-   * @param {Object} ctx
+   * @param {http.IncomingMessage} req request
+   * @param {http.ServerResponse} res response
+   * @param {object} ctx context
    */
   async handlerPostAdminTicket(req, res, ctx) {
     const _scope = _fileScope('handlerPostAdminTicket');
@@ -299,9 +302,9 @@ class Service extends Dingus {
 
 
   /**
-   * @param {http.IncomingMessage} req 
-   * @param {http.ServerResponse} res 
-   * @param {Object} ctx 
+   * @param {http.IncomingMessage} req request
+   * @param {http.ServerResponse} res response
+   * @param {object} ctx context
    */
   async handlerGetMeta(req, res, ctx) {
     const _scope = _fileScope('handlerGetMeta');
@@ -321,9 +324,9 @@ class Service extends Dingus {
 
 
   /**
-   * @param {http.IncomingMessage} req 
-   * @param {http.ServerResponse} res 
-   * @param {Object} ctx 
+   * @param {http.IncomingMessage} req request
+   * @param {http.ServerResponse} res response
+   * @param {object} ctx context
    */
   async handlerGetAuthorization(req, res, ctx) {
     const _scope = _fileScope('handlerGetAuthorization');
@@ -340,9 +343,9 @@ class Service extends Dingus {
 
 
   /**
-   * @param {http.IncomingMessage} req 
-   * @param {http.ServerResponse} res 
-   * @param {Object} ctx 
+   * @param {http.IncomingMessage} req request
+   * @param {http.ServerResponse} res response
+   * @param {object} ctx context
    */
   async handlerPostAuthorization(req, res, ctx) {
     const _scope = _fileScope('handlerPostAuthorization');
@@ -364,9 +367,9 @@ class Service extends Dingus {
 
 
   /**
-   * @param {http.IncomingMessage} req 
-   * @param {http.ServerResponse} res 
-   * @param {Object} ctx 
+   * @param {http.IncomingMessage} req request
+   * @param {http.ServerResponse} res response
+   * @param {object} ctx context
    */
   async handlerPostConsent(req, res, ctx) {
     const _scope = _fileScope('handlerPostConsent');
@@ -386,9 +389,9 @@ class Service extends Dingus {
 
 
   /**
-   * @param {http.IncomingMessage} req 
-   * @param {http.ServerResponse} res 
-   * @param {Object} ctx 
+   * @param {http.IncomingMessage} req request
+   * @param {http.ServerResponse} res response
+   * @param {object} ctx context
    */
   async handlerPostTicket(req, res, ctx) {
     const _scope = _fileScope('handlerPostTicket');
@@ -408,9 +411,9 @@ class Service extends Dingus {
 
 
   /**
-   * @param {http.IncomingMessage} req 
-   * @param {http.ServerResponse} res 
-   * @param {Object} ctx 
+   * @param {http.IncomingMessage} req request
+   * @param {http.ServerResponse} res response
+   * @param {object} ctx context
    */
   async handlerPostToken(req, res, ctx) {
     const _scope = _fileScope('handlerPostToken');
@@ -430,9 +433,9 @@ class Service extends Dingus {
 
 
   /**
-   * @param {http.IncomingMessage} req 
-   * @param {http.ServerResponse} res 
-   * @param {Object} ctx 
+   * @param {http.IncomingMessage} req request
+   * @param {http.ServerResponse} res response
+   * @param {object} ctx context
    */
   async handlerPostRevocation(req, res, ctx) {
     const _scope = _fileScope('handlerPostRevocation');
@@ -452,9 +455,9 @@ class Service extends Dingus {
 
 
   /**
-   * @param {http.IncomingMessage} req 
-   * @param {http.ServerResponse} res 
-   * @param {Object} ctx 
+   * @param {http.IncomingMessage} req request
+   * @param {http.ServerResponse} res response
+   * @param {object} ctx context
    */
   async handlerPostIntrospection(req, res, ctx) {
     const _scope = _fileScope('handlerPostIntrospection');
@@ -476,9 +479,9 @@ class Service extends Dingus {
 
 
   /**
-   * @param {http.IncomingMessage} req 
-   * @param {http.ServerResponse} res 
-   * @param {Object} ctx 
+   * @param {http.IncomingMessage} req request
+   * @param {http.ServerResponse} res response
+   * @param {object} ctx context
    */
   async handlerPostUserInfo(req, res, ctx) {
     const _scope = _fileScope('handlerPostUserInfo');
@@ -498,9 +501,9 @@ class Service extends Dingus {
 
 
   /**
-   * @param {http.IncomingMessage} req 
-   * @param {http.ServerResponse} res 
-   * @param {Object} ctx 
+   * @param {http.IncomingMessage} req request
+   * @param {http.ServerResponse} res response
+   * @param {object} ctx context
    */
   async handlerGetRoot(req, res, ctx) {
     const _scope = _fileScope('handlerGetRoot');
@@ -521,6 +524,9 @@ class Service extends Dingus {
 
   /**
    * Temporary to see what an unsolicited payload contains.
+   * @param {http.IncomingMessage} req request
+   * @param {http.ServerResponse} res response
+   * @param {object} ctx context
    */
   async handlerWhaGwan(req, res, ctx) {
     this.setResponseType(this.responseTypes, req, res, ctx);
@@ -529,9 +535,9 @@ class Service extends Dingus {
   }
 
   /**
-   * @param {http.IncomingMessage} req 
-   * @param {http.ServerResponse} res 
-   * @param {Object} ctx 
+   * @param {http.IncomingMessage} req request
+   * @param {http.ServerResponse} res response
+   * @param {object} ctx context
    */
   async handlerGetHealthcheck(req, res, ctx) {
     const _scope = _fileScope('handlerGetHealthcheck');
@@ -544,9 +550,9 @@ class Service extends Dingus {
 
 
   /**
-   * @param {http.IncomingMessage} req
-   * @param {http.ServerResponse} res
-   * @param {Object} ctx
+   * @param {http.IncomingMessage} req request
+   * @param {http.ServerResponse} res response
+   * @param {object} ctx context
    */
   async handlerGetAdminMaintenance(req, res, ctx) {
     const _scope = _fileScope('handlerGetAdminMaintenance');
@@ -567,9 +573,9 @@ class Service extends Dingus {
    * Intercept this and redirect if we have enough information, otherwise default to framework.
    * Fixing this will likely have to wait until an e2e test framework is in place.
    * The redirect attempt should probably be contained in a Manager method, but here it is for now.
-   * @param {http.IncomingMessage} req
-   * @param {http.ServerResponse} res
-   * @param {Object} ctx
+   * @param {http.IncomingMessage} req request
+   * @param {http.ServerResponse} res response
+   * @param {object} ctx context
    */
   async handlerInternalServerError(req, res, ctx) {
     const _scope = _fileScope('handlerInternalServerError');

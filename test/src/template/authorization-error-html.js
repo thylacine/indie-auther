@@ -27,7 +27,7 @@ describe('Authorization Error HTML Template', function () {
     ctx.session = {
       error: 'error_name',
       errorDescriptions: ['something went wrong', 'another thing went wrong'],
-    }
+    };
     const result = template(ctx, config);
     await lintHtml(result);
     assert(result);

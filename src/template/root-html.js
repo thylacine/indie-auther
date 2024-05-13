@@ -3,6 +3,9 @@
 const th = require('./template-helper');
 const { sessionNavLinks } = require('@squeep/authentication-module');
 
+/**
+ * @returns {string} section
+ */
 function aboutSection() {
   return `
       <section class="about">
@@ -19,6 +22,10 @@ function aboutSection() {
       </section>`;
 }
 
+/**
+ * @param {string} contactHTML content
+ * @returns {string} section
+ */
 function contactSection(contactHTML) {
   let section = '';
   if (contactHTML) {
@@ -31,13 +38,13 @@ ${contactHTML}
 
 /**
  * 
- * @param {Object} ctx
- * @param {Object} options
- * @param {Object} options.manager
- * @param {String} options.manager.pageTitle
- * @param {String[]} options.manager.footerEntries
- * @param {String} options.adminContactHTML
- * @returns {String}
+ * @param {object} ctx context
+ * @param {object} options options
+ * @param {object} options.manager manager options
+ * @param {string} options.manager.pageTitle page title
+ * @param {string[]} options.manager.footerEntries footer entries
+ * @param {string=} options.adminContactHTML content
+ * @returns {string} page
  */
 module.exports = (ctx, options) => {
   const pagePathLevel = 0;

@@ -21,7 +21,7 @@ class Database {
    * At the minimum, this will validate a compatible schema is present and usable.
    * Some engines will also perform other initializations or async actions which
    * are easier handled outside the constructor.
-  */
+   */
   async initialize() {
     const _scope = _fileScope('initialize');
 
@@ -39,15 +39,15 @@ class Database {
 
 
   /**
-   * @typedef {Object} SchemaVersionObject
-   * @property {Number} major
-   * @property {Number} minor
-   * @property {Number} patch
+   * @typedef {object} SchemaVersionObject
+   * @property {number} major major
+   * @property {number} minor minor
+   * @property {number} patch patch
    */
   /**
    * Query the current schema version.
    * This is a standalone query function, as it is called before statements are loaded.
-   * @returns {Promise<SchemaVersionObject>}
+   * @returns {Promise<SchemaVersionObject>} schema version
    */
   async _currentSchema() {
     this._notImplemented('_currentSchema', arguments);
@@ -73,7 +73,7 @@ class Database {
 
   /**
    * Wrap a function call in a transaction context.
-   * @param {*} dbCtx
+   * @param {*} dbCtx db context
    * @param {Function} fn fn(txCtx)
    */
   async transaction(dbCtx, fn) {
@@ -101,9 +101,9 @@ class Database {
    * - infinites
    * - null
    * - uuid
-   * @param {Object} object
-   * @param {String[]} properties
-   * @param {String[]} types
+   * @param {object} object object
+   * @param {string[]} properties properties
+   * @param {string[]} types types
    */
   _ensureTypes(object, properties, types) {
     const _scope = _fileScope('_ensureTypes');
@@ -157,14 +157,14 @@ class Database {
 
 
   /**
-   * @typedef {Object} Authentication
-   * @property {String} identifier
-   * @property {String=} credential
-   * @property {Date} created
-   * @property {Date=} lastAuthentication
+   * @typedef {object} Authentication
+   * @property {string} identifier identifier
+   * @property {string=} credential credential
+   * @property {Date} created created
+   * @property {Date=} lastAuthentication last authentication
    */
   /**
-   * @param {Authentication} authentication 
+   * @param {Authentication} authentication authentication
    */
   _validateAuthentication(authentication) {
     [
@@ -177,14 +177,14 @@ class Database {
 
 
   /**
-   * @typedef {Object} Resource
-   * @property {String} resourceId - uuid
-   * @property {String} secret
-   * @property {String} description
-   * @property {Date} created
+   * @typedef {object} Resource
+   * @property {string} resourceId uuid
+   * @property {string} secret secret
+   * @property {string} description description
+   * @property {Date} created created at
    */
   /**
-   * @param {Resource} resource
+   * @param {Resource} resource resource
    */
   _validateResource(resource) {
     [
@@ -196,24 +196,24 @@ class Database {
 
 
   /**
-   * @typedef {Object} Token
-   * @property {String} codeId - uuid
-   * @property {String} profile
-   * @property {Date} created
-   * @property {Date=} expires
-   * @property {Date=} refreshExpires
-   * @property {Date=} refreshed
-   * @property {*=} duration
-   * @property {*=} refreshDuration
-   * @property {Number|BigInt=} refresh_count
-   * @property {Boolean} is_revoked
-   * @property {Boolean} is_token
-   * @property {String} client_id
-   * @property {String[]} scopes
-   * @property {Object=} profileData
+   * @typedef {object} Token
+   * @property {string} codeId uuid
+   * @property {string} profile profile
+   * @property {Date} created created at
+   * @property {Date=} expires expires at
+   * @property {Date=} refreshExpires refresh expires at
+   * @property {Date=} refreshed refreshed at
+   * @property {*=} duration duration
+   * @property {*=} refreshDuration refresh duration
+   * @property {number | bigint=} refresh_count refresh count
+   * @property {boolean} is_revoked is revoked
+   * @property {boolean} is_token is token
+   * @property {string} client_id client id
+   * @property {string[]} scopes scopes
+   * @property {object=} profileData profile data
    */
   /**
-   * @param {Token} token
+   * @param {Token} token token
    */
   _validateToken(token) {
     [
@@ -233,8 +233,8 @@ class Database {
    * Interface methods need implementations.  Ensure the db-interaction
    * methods on the base class call this, so they may be overridden by
    * implementation classes.
-   * @param {String} method
-   * @param {arguments} args
+   * @param {string} method method
+   * @param {arguments} args args
    */
   _notImplemented(method, args) {
     this.logger.error(_fileScope(method), 'abstract method called', Array.from(args));
@@ -244,7 +244,7 @@ class Database {
 
   /**
    * Get all the almanac entries.
-   * @param {*} dbCtx
+   * @param {*} dbCtx db context
    */
   async almanacGetAll(dbCtx) {
     this._notImplemented('almanacGetAll', arguments);
@@ -253,9 +253,9 @@ class Database {
 
   /**
    * Insert or update an almanac entry.
-   * @param {*} dbCtx
-   * @param {String} event
-   * @param {Date=} date
+   * @param {*} dbCtx db context
+   * @param {string} event event
+   * @param {Date=} date date
    */
   async almanacUpsert(dbCtx, event, date) {
     this._notImplemented('almanacUpsert', arguments);
@@ -264,9 +264,9 @@ class Database {
 
   /**
    * Fetch the authentication record for an identifier.
-   * @param {*} dbCtx
-   * @param {String} identifier
-   * @returns {Promise<Authentication>}
+   * @param {*} dbCtx db context
+   * @param {string} identifier identifier
+   * @returns {Promise<Authentication>} authentication
    */
   async authenticationGet(dbCtx, identifier) {
     this._notImplemented('authenticationGet', arguments);
@@ -276,8 +276,8 @@ class Database {
   /**
    * Update the authentication record for the identifier that
    * correct credentials have been supplied.
-   * @param {*} dbCtx
-   * @param {String} identifier
+   * @param {*} dbCtx db context
+   * @param {string} identifier identifier
    * @returns {Promise<void>}
    */
   async authenticationSuccess(dbCtx, identifier) {
@@ -287,10 +287,10 @@ class Database {
 
   /**
    * Insert or update the credential for an identifier.
-   * @param {*} dbCtx
-   * @param {String} identifier
-   * @param {String} credential
-   * @param {String=} otpKey
+   * @param {*} dbCtx db context
+   * @param {string} identifier identifier
+   * @param {string} credential credential
+   * @param {string=} otpKey otp key
    * @returns {Promise<void>}
    */
   async authenticationUpsert(dbCtx, identifier, credential, otpKey) {
@@ -300,9 +300,9 @@ class Database {
 
   /**
    * Update the otpKey for an identifier.
-   * @param {*} dbCtx
-   * @param {String} identifier
-   * @param {String=} otpKey
+   * @param {*} dbCtx db context
+   * @param {string} identifier identifier
+   * @param {string=} otpKey otp key
    * @returns {Promise<void>}
    */
   async authenticationUpdateOTPKey(dbCtx, identifier, otpKey) {
@@ -312,9 +312,9 @@ class Database {
 
   /**
    * Update the credential for an identifier.
-   * @param {*} dbCtx
-   * @param {String} identifier
-   * @param {String} credential
+   * @param {*} dbCtx db context
+   * @param {string} identifier identifier
+   * @param {string} credential credential
    * @returns {Promise<void>}
    */
   async authenticationUpdateCredential(dbCtx, identifier, credential) {
@@ -324,9 +324,9 @@ class Database {
 
   /**
    * Determine if profile url is known to this service.
-   * @param {*} dbCtx
-   * @param {String} profile
-   * @returns {Promise<Boolean>}
+   * @param {*} dbCtx db context
+   * @param {string} profile profile
+   * @returns {Promise<boolean>} is valid
    */
   async profileIsValid(dbCtx, profile) {
     this._notImplemented('profileGet', arguments);
@@ -336,9 +336,9 @@ class Database {
   /**
    * Insert a new relationship between a profile endpoint and
    * an authenticated identifier.
-   * @param {*} dbCtx
-   * @param {String} profile
-   * @param {String} identifier
+   * @param {*} dbCtx db context
+   * @param {string} profile profile
+   * @param {string} identifier identifier
    * @returns {Promise<void>}
    */
   async profileIdentifierInsert(dbCtx, profile, identifier) {
@@ -348,9 +348,9 @@ class Database {
 
   /**
    * Adds a scope to be available for a profile to include on any authorization request.
-   * @param {*} dbCtx
-   * @param {String} profile
-   * @param {String} scope
+   * @param {*} dbCtx db context
+   * @param {string} profile profile
+   * @param {string} scope scope
    * @returns {Promise<void>}
    */
   async profileScopeInsert(dbCtx, profile, scope) {
@@ -359,24 +359,26 @@ class Database {
 
 
   /**
-   * @typedef {Object} ScopeDetails
-   * @property {String} description
-   * @property {String[]=} profiles
+   * @typedef {object} ScopeDetails
+   * @property {string} description description
+   * @property {string[]=} profiles profiles
    */
   /**
-   * @typedef {Object.<String, Object>} ProfileScopes
-   * @property {Object.<String, Object>} profile
-   * @property {Object.<String, ScopeDetails>} profile.scope
+   * @typedef {object} Profile
+   * @property {ScopeDetails} scope scope
    */
   /**
-   * @typedef {Object.<String, Object>} ScopeIndex
-   * @property {ScopeDetails} scope
+   * @typedef {{[profile: string]: Profile}} ProfileScopes
    */
   /**
-   * @typedef {Object} ProfilesScopesReturn
-   * @property {ProfileScopes} profileScopes
-   * @property {ScopeIndex} scopeIndex
-   * @property {String[]} profiles
+   * @typedef {{[scope: string]: ScopeDetails}} ScopeIndex
+   * @property {ScopeDetails} scope scope details
+   */
+  /**
+   * @typedef {object} ProfilesScopesReturn
+   * @property {ProfileScopes} profileScopes profile scopes
+   * @property {ScopeIndex} scopeIndex scope index
+   * @property {string[]} profiles profiles
    */
   /**
    * Returns an object containing:
@@ -384,9 +386,9 @@ class Database {
    *   which each contain a description of the scope and a list of profiles offering it
    * - an object with scopes as keys to the same scope objects
    * - a list of profiles
-   * @param {*} dbCtx
-   * @param {String} identifier
-   * @returns {Promise<ProfileScopesReturn>}
+   * @param {*} dbCtx db context
+   * @param {string} identifier identifier
+   * @returns {Promise<ProfilesScopesReturn>} profiles scopes
    */
   async profilesScopesByIdentifier(dbCtx, identifier) {
     this._notImplemented('profilesScopesByIdentifier', arguments);
@@ -395,18 +397,18 @@ class Database {
 
   /**
    * @typedef ProfileScopesRow
-   * @property profile
-   * @property scope
-   * @property description
-   * @property application
-   * @property isPermanent
-   * @property isManuallyAdded
+   * @property {string} profile profile
+   * @property {string} scope scope
+   * @property {string} description description
+   * @property {string} application application
+   * @property {boolean} isPermanent avoid cleanup
+   * @property {boolean} isManuallyAdded avoid cleanup
    */
   /**
    * Convert db row data into associative structures.
    * Same behavior is shared by multiple engines.
-   * @param {ProfileScopesRow[]} profileScopesRows
-   * @returns {ProfileScopesReturn}
+   * @param {ProfileScopesRow[]} profileScopesRows profile scopes row
+   * @returns {ProfilesScopesReturn} profiles scopes
    */
   static _profilesScopesBuilder(profileScopesRows) {
     const scopeIndex = {};
@@ -445,9 +447,9 @@ class Database {
 
   /**
    * Sets list of additional scopes available to profile.
-   * @param {*} dbCtx
-   * @param {String} profile
-   * @param {String[]} scopes
+   * @param {*} dbCtx db context
+   * @param {string} profile profile
+   * @param {string[]} scopes scopes
    * @returns {Promise<void>}
    */
   async profileScopesSetAll(dbCtx, profile, scopes) {
@@ -457,20 +459,19 @@ class Database {
 
   /**
    * Create (or revoke a duplicate) code as a token entry.
-   * @param {*} dbCtx
-   * @param {Object} data
-   * @param {String} data.codeId
-   * @param {Date} data.created
-   * @param {Boolean} data.isToken
-   * @param {String} data.clientId
-   * @param {String} data.profile - profile uri
-   * @param {String} data.identifier
-   * @param {String[]} data.scopes
-   * @param {Number|Null} data.lifespanSeconds - null sets expiration to Infinity
-   * @param {Number|Null} data.refreshLifespanSeconds - null sets refresh to none
-   * @param {String|Null} data.resource
-   * @param {Object|Null} data.profileData - profile data from profile uri
-   * @returns {Promise<Boolean>} whether redemption was successful
+   * @param {*} dbCtx db context
+   * @param {object} data data
+   * @param {string} data.codeId code id
+   * @param {Date} data.created created at
+   * @param {boolean} data.isToken is token
+   * @param {string} data.clientId client id
+   * @param {string} data.profile profile uri
+   * @param {string} data.identifier identifier
+   * @param {string[]} data.scopes scopesx
+   * @param {number | null} data.lifespanSeconds null sets expiration to Infinity
+   * @param {number | null} data.refreshLifespanSeconds null sets refresh to none
+   * @param {object | null} data.profileData profile data from profile uri
+   * @returns {Promise<boolean>} whether redemption was successful
    */
   async redeemCode(dbCtx, { codeId, created, isToken, clientId, profile, identifier, scopes, lifespanSeconds, refreshLifespanSeconds, profileData } = {}) {
     this._notImplemented('redeemCode', arguments);
@@ -478,18 +479,18 @@ class Database {
 
 
   /**
-   * @typedef {Object} RefreshedToken
-   * @property {Date} expires
-   * @property {Date} refreshExpires
-   * @property {String[]=} scopes if scopes were reduced
+   * @typedef {object} RefreshedToken
+   * @property {Date} expires expires at
+   * @property {Date} refreshExpires refresh expires at
+   * @property {string[]=} scopes if scopes were reduced
    */
   /**
    * Redeem a refresh token to renew token codeId.
-   * @param {*} dbCtx
-   * @param {String} codeId
-   * @param {Date} refreshed
-   * @param {String[]} removeScopes
-   * @returns {Promise<RefreshedToken>}
+   * @param {*} dbCtx db context
+   * @param {string} codeId code id
+   * @param {Date} refreshed refreshed at
+   * @param {string[]} removeScopes remove scopes
+   * @returns {Promise<RefreshedToken>} refreshed token
    */
   async refreshCode(dbCtx, codeId, refreshed, removeScopes) {
     this._notImplemented('refreshCode', arguments);
@@ -498,9 +499,9 @@ class Database {
 
   /**
    * Fetch a resource server record.
-   * @param {*} dbCtx
-   * @param {String} identifier uuid
-   * @returns {Promise<Resource>}
+   * @param {*} dbCtx db context
+   * @param {string} resourceId uuid
+   * @returns {Promise<Resource>} resource
    */
   async resourceGet(dbCtx, resourceId) {
     this._notImplemented('resourceGet', arguments);
@@ -509,10 +510,10 @@ class Database {
 
   /**
    * Create, or update description of, a resourceId.
-   * @param {*} dbCtx
-   * @param {String=} resourceId uuid
-   * @param {String=} secret
-   * @param {String=} description
+   * @param {*} dbCtx db context
+   * @param {string=} resourceId uuid
+   * @param {string=} secret secret
+   * @param {string=} description description
    * @returns {Promise<void>}
    */
   async resourceUpsert(dbCtx, resourceId, secret, description) {
@@ -522,10 +523,11 @@ class Database {
 
   /**
    * Register a scope and its description.
-   * @param {*} dbCtx
-   * @param {String} scope
-   * @param {String} application
-   * @param {String} description
+   * @param {*} dbCtx db context
+   * @param {string} scope scope
+   * @param {string} application application
+   * @param {string} description description
+   * @param {boolean} manuallyAdded is manually added
    * @returns {Promise<void>}
    */
   async scopeUpsert(dbCtx, scope, application, description, manuallyAdded = false) {
@@ -535,9 +537,9 @@ class Database {
 
   /**
    * Remove a non-permanent scope if it is not currently in use.
-   * @param {*} dbCtx
-   * @param {String} scope
-   * @returns {Promise<Boolean>}
+   * @param {*} dbCtx db context
+   * @param {string} scope scope
+   * @returns {Promise<boolean>} deleted
    */
   async scopeDelete(dbCtx, scope) {
     this._notImplemented('scopeDelete', arguments);
@@ -545,16 +547,16 @@ class Database {
 
 
   /**
-   * @typedef {Number|BigInt} CleanupResult
+   * @typedef {number | bigint} CleanupResult
    */
   /**
-   * @typedef {Object} CleanupResult
+   * @alias {object} CleanupResult
    */
   /**
    * Remove any non-permanent and non-manually-created scopes not currently in use.
-   * @param {*} dbCtx
-   * @param {Number} atLeastMsSinceLast skip cleanup if already executed this recently
-   * @returns {Promise<CleanupResult>}
+   * @param {*} dbCtx db context
+   * @param {number} atLeastMsSinceLast skip cleanup if already executed this recently
+   * @returns {Promise<CleanupResult>} cleanup result
    */
   async scopeCleanup(dbCtx, atLeastMsSinceLast) {
     this._notImplemented('scopeClean', arguments);
@@ -563,10 +565,10 @@ class Database {
 
   /**
    * Forget tokens after they have expired, and redeemed codes after they have expired.
-   * @param {*} dbCtx
-   * @param {Number} codeLifespanSeconds
-   * @param {Number} atLeastMsSinceLast skip cleanup if already executed this recently
-   * @returns {Promise<CleanupResult>}
+   * @param {*} dbCtx db context
+   * @param {number} codeLifespanSeconds code lifespan seconds
+   * @param {number} atLeastMsSinceLast skip cleanup if already executed this recently
+   * @returns {Promise<CleanupResult>} cleanup result
    */
   async tokenCleanup(dbCtx, codeLifespanSeconds, atLeastMsSinceLast) {
     this._notImplemented('tokenCleanup', arguments);
@@ -575,9 +577,9 @@ class Database {
 
   /**
    * Look up a redeemed token by code_id.
-   * @param {*} dbCtx
-   * @param {String} codeId
-   * @returns {Promise<Token>}
+   * @param {*} dbCtx db context
+   * @param {string} codeId code id
+   * @returns {Promise<Token>} token
    */
   async tokenGetByCodeId(dbCtx, codeId) {
     this._notImplemented('tokenGetByCodeId', arguments);
@@ -586,8 +588,8 @@ class Database {
 
   /**
    * Sets a redeemed token as revoked.
-   * @param {*} dbCtx
-   * @param {String} codeId - uuid
+   * @param {*} dbCtx db context
+   * @param {string} codeId - uuid
    * @returns {Promise<void>}
    */
   async tokenRevokeByCodeId(dbCtx, codeId) {
@@ -597,8 +599,8 @@ class Database {
 
   /**
    * Revoke the refreshability of a codeId.
-   * @param {*} dbCtx
-   * @param {String} codeId - uuid
+   * @param {*} dbCtx db context
+   * @param {string} codeId - uuid
    * @returns {Promise<void>}
    */
   async tokenRefreshRevokeByCodeId(dbCtx, codeId) {
@@ -608,26 +610,27 @@ class Database {
 
   /**
    * Get all tokens assigned to identifier.
-   * @param {*} dbCtx
-   * @param {String} identifier
-   * @returns {Promise<Tokens[]>}
+   * @param {*} dbCtx db context
+   * @param {string} identifier identifier
+   * @returns {Promise<Token[]>} token
    */
   async tokensGetByIdentifier(dbCtx, identifier) {
     this._notImplemented('tokensGetByIdentifier', arguments);
   }
 
 
-  /** @typedef {Object} RedeemedTicketData
-   * @property {String} subject
-   * @property {String} resource
-   * @property {String=} iss
-   * @property {String} ticket
-   * @property {String} token
+  /**
+   * @typedef {object} RedeemedTicketData
+   * @property {string} subject subject
+   * @property {string} resource resource
+   * @property {string=} iss issuer
+   * @property {string} ticket ticket
+   * @property {string} token token
    */
   /**
    * Persist details of a redeemed ticket.
-   * @param {*} dbCtx
-   * @param {RedeemedTicketData} redeemedData
+   * @param {*} dbCtx db context
+   * @param {RedeemedTicketData} redeemedData redeemed data
    * @returns {Promise<void>}
    */
   async ticketRedeemed(dbCtx, redeemedData) {
@@ -637,18 +640,20 @@ class Database {
 
   /**
    * Update details of a redeemed ticket that it has been published.
-   * @param {*} dbCtx
-   * @param {RedeemedTicketData} redeemedData
+   * @param {*} dbCtx db context
+   * @param {RedeemedTicketData} redeemedData redeemed data
    * @returns {Promise<void>}
    */
   async ticketTokenPublished(dbCtx, redeemedData) {
     this._notImplemented('ticketTokenPublished', arguments);
   }
 
+
   /**
    * Retrieve redeemed tokens which have not yet been published to queue.
-   * @param {Number} limit
-   * @returns {Promise<RedeemedData[]>}
+   * @param {*} dbCtx db context
+   * @param {number} limit limit
+   * @returns {Promise<RedeemedTicketData[]>} redeemed but not published
    */
   async ticketTokenGetUnpublished(dbCtx, limit) {
     this._notImplemented('ticketTokenGetUnpublished', arguments);

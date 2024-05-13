@@ -10,17 +10,17 @@ const path = require('path');
  */
 
 /**
- * @typedef {Object} SchemaVersionObject
- * @property {Number} major
- * @property {Number} minor
- * @property {Number} patch
+ * @typedef {object} SchemaVersionObject
+ * @property {number} major major
+ * @property {number} minor minor
+ * @property {number} patch patch
  */
 
 
 /**
  * Split a dotted version string into parts.
- * @param {String} v
- * @returns {SchemaVersionObject}
+ * @param {string} v version string
+ * @returns {SchemaVersionObject} version object
  */
 function schemaVersionStringToObject(v) {
   const [ major, minor, patch ] = v.split('.', 3).map((x) => parseInt(x, 10));
@@ -30,8 +30,9 @@ function schemaVersionStringToObject(v) {
 
 /**
  * Render a version object numerically.
- * @param {SchemaVersionObject} v
- * @returns {Number}
+ * Assumes no part will be greater than 1000.
+ * @param {SchemaVersionObject} v version object
+ * @returns {number} number
  */
 function schemaVersionObjectToNumber(v) {
   const vScale = 1000;
@@ -41,8 +42,8 @@ function schemaVersionObjectToNumber(v) {
 
 /**
  * Convert dotted version string into number.
- * @param {String} v
- * @returns {Number}
+ * @param {string} v version string
+ * @returns {number} number
  */
 function schemaVersionStringToNumber(v) {
   return schemaVersionObjectToNumber(schemaVersionStringToObject(v));
@@ -51,9 +52,9 @@ function schemaVersionStringToNumber(v) {
 
 /**
  * Version string comparison, for sorting.
- * @param {String} a
- * @param {String} b
- * @returns {Number}
+ * @param {string} a version string
+ * @param {string} b version string
+ * @returns {number} cmp
  */
 function schemaVersionStringCmp(a, b) {
   return schemaVersionStringToNumber(a) - schemaVersionStringToNumber(b);
@@ -62,9 +63,10 @@ function schemaVersionStringCmp(a, b) {
 
 /**
  * Check if an entry in a directory is a directory containing a migration file.
- * @param {String} schemaDir
- * @param {String} name
- * @returns {Boolean}
+ * @param {string} schemaDir schema dir
+ * @param {string} name name
+ * @param {string} migrationFile migration file
+ * @returns {boolean} is
  */
 function isSchemaMigrationDirectory(schemaDir, name, migrationFile = 'apply.sql') {
   // eslint-disable-next-line security/detect-non-literal-fs-filename
@@ -75,7 +77,7 @@ function isSchemaMigrationDirectory(schemaDir, name, migrationFile = 'apply.sql'
       // eslint-disable-next-line security/detect-non-literal-fs-filename
       applyStat = fs.statSync(path.join(schemaDir, name, migrationFile));
       return applyStat.isFile();
-    } catch (e) {
+    } catch (e) { // eslint-disable-line no-unused-vars
       return false;
     }
   }
@@ -86,8 +88,8 @@ function isSchemaMigrationDirectory(schemaDir, name, migrationFile = 'apply.sql'
 /**
  * Return an array of schema migration directory names within engineDir,
  * sorted in increasing order.
- * @param {String} engineDir
- * @returns {String[]}
+ * @param {string} engineDir path to implementation
+ * @returns {string[]} versions
  */
 function allSchemaVersions(engineDir) {
   const schemaDir = path.join(engineDir, 'sql', 'schema');
@@ -101,12 +103,12 @@ function allSchemaVersions(engineDir) {
 /**
  * Return an array of schema migration directory names within engineDir,
  * which are within supported range, and are greater than the current
- * @param {String} engineDir
- * @param {SchemaVersionObject} current
- * @param {Object} supported
- * @param {SchemaVersionObject} supported.min
- * @param {SchemaVersionObject} supported.max
- * @returns {String[]}
+ * @param {string} engineDir path to implementation
+ * @param {SchemaVersionObject} current version
+ * @param {object} supported range of supported versions
+ * @param {SchemaVersionObject} supported.min minimum version
+ * @param {SchemaVersionObject} supported.max maximum version
+ * @returns {string[]} applicable versions
  */
 function unappliedSchemaVersions(engineDir, current, supported) {
   const min = schemaVersionObjectToNumber(supported.min);

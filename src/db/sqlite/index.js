@@ -60,8 +60,8 @@ class DatabaseSQLite extends Database {
 
   /**
    * Boolean to 0/1 representation for SQLite params.
-   * @param {Boolean} bool
-   * @returns {Number}
+   * @param {boolean} bool boolean
+   * @returns {number} number
    */
   static _booleanToNumeric(bool) {
     // eslint-disable-next-line security/detect-object-injection
@@ -84,7 +84,7 @@ class DatabaseSQLite extends Database {
     let metaExists = tableExists.get();
     if (metaExists === undefined) {
       const fPath = path.join(__dirname, 'sql', 'schema', 'init.sql');
-      // eslint-disable-next-line security/detect-non-literal-fs-filename
+       
       const fSql = fs.readFileSync(fPath, { encoding: 'utf8' });
       this.db.exec(fSql);
       metaExists = tableExists.get();
@@ -139,7 +139,7 @@ class DatabaseSQLite extends Database {
       };
     };
 
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
+     
     for (const f of fs.readdirSync(sqlDir)) {
       const fPath = path.join(sqlDir, f);
       const { name: fName, ext: fExt } = path.parse(f);

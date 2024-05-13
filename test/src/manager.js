@@ -1,10 +1,9 @@
-/* eslint-env mocha */
-/* eslint-disable capitalized-comments, sonarjs/no-duplicate-string, sonarjs/no-identical-functions */
+/* eslint-disable sonarjs/no-duplicate-string */
 
 'use strict';
 
 const assert = require('assert');
-const sinon = require('sinon'); // eslint-disable-line node/no-unpublished-require
+const sinon = require('sinon');
 
 const Manager = require('../../src/manager');
 const Config = require('../../config');
@@ -1558,13 +1557,13 @@ describe('Manager', function () {
       manager.mysteryBox.unpack.resolves({});
       req.getHeader.returns('Bearer XXX');
       await manager._checkTokenValidationRequest(dbCtx, req, ctx);
-      assert(ctx.session.error)
+      assert(ctx.session.error);
     });
     it('covers no token', async function () {
       manager.mysteryBox.unpack.resolves({ c: 'xxx' });
       req.getHeader.returns('Bearer XXX');
       await manager._checkTokenValidationRequest(dbCtx, req, ctx);
-      assert(ctx.session.error)
+      assert(ctx.session.error);
     });
     it('covers db error', async function () {
       manager.mysteryBox.unpack.resolves({ c: 'xxx' });

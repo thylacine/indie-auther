@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/no-duplicate-string */
 'use strict';
 
 const common = require('./common');
@@ -17,6 +18,10 @@ const validBase64URLRE = /^[-A-Za-z0-9_]+$/;
 const scopeSplitRE = / +/;
 
 const supportedCodeChallengeMethods = ['S256', 'SHA256'];
+
+/**
+ * @typedef {import('node:http')} http
+ */
 
 class Manager {
   constructor(logger, db, options) {
@@ -64,12 +69,12 @@ class Manager {
   /**
    * Add an error to a session, keeping only the most-severe code, but all descriptions.
    * This error is sent along on the redirection back to client endpoint.
-   * @param {Object} ctx
-   * @param {Object} ctx.session
-   * @param {String[]=} ctx.session.errorDescriptions
-   * @param {String=} ctx.session.error
-   * @param {String} error
-   * @param {String} errorDescription
+   * @param {object} ctx context
+   * @param {object} ctx.session session
+   * @param {string[]=} ctx.session.errorDescriptions errors
+   * @param {string=} ctx.session.error error
+   * @param {string} error error
+   * @param {string} errorDescription error
    */
   static _setError(ctx, error, errorDescription) {
     const errorPrecedence = [ // By increasing severity
@@ -109,7 +114,7 @@ class Manager {
    * The authorization server MUST include the HTTP Cache-Control response
    * header field with a value of no-store in any response
    * containing tokens, credentials, or other sensitive information.
-   * @param {http.ServerResponse} res
+   * @param {http.ServerResponse} res response
    */
   static _sensitiveResponse(res) {
     Object.entries({
@@ -121,8 +126,8 @@ class Manager {
 
   /**
    * Sets params entries as url search parameters.
-   * @param {URL} url
-   * @param {Object} params
+   * @param {URL} url url
+   * @param {object} params parameters
    */
   static _setSearchParams(url, params) {
     Object.entries(params).forEach((param) => url.searchParams.set(...param));
@@ -131,9 +136,8 @@ class Manager {
 
   /**
    * Serve the informational root page.
-   * @param {http.ClientRequest} req 
-   * @param {http.ServerResponse} res
-   * @param {Object} ctx 
+   * @param {http.ServerResponse} res response
+   * @param {object} ctx context
    */
   async getRoot(res, ctx) {
     const _scope = _fileScope('getRoot');
@@ -146,8 +150,8 @@ class Manager {
 
   /**
    * Serve the metadata for this service.
-   * @param {http.ServerResponse} res
-   * @param {Object} ctx 
+   * @param {http.ServerResponse} res response
+   * @param {object} ctx context
    */
   async getMeta(res, ctx) {
     const _scope = _fileScope('getMeta');
@@ -187,8 +191,8 @@ class Manager {
    * Process an authorization request from a client.
    * User has authenticated, check if user matches profile,
    * present user with consent form.
-   * @param {http.ServerResponse} res
-   * @param {Object} ctx 
+   * @param {http.ServerResponse} res response
+   * @param {object} ctx context
    */
   async getAuthorization(res, ctx) {
     const _scope = _fileScope('getAuthorization');
@@ -306,7 +310,7 @@ class Manager {
 
   /**
    * Validates, fetches, and parses client_id url, populating clientIdentifier with client h-app data.
-   * @param {Object} ctx
+   * @param {object} ctx context
    */
   async _clientIdRequired(ctx) {
     if (ctx.queryParams['client_id']) {
@@ -332,7 +336,7 @@ class Manager {
 
   /**
    * Ensure redirect_uri exists and is corroborated by clientIdentifier data.
-   * @param {Object} ctx 
+   * @param {object} ctx context
    */
   static _redirectURIRequired(ctx) {
     if (ctx.queryParams['redirect_uri']) {
@@ -355,7 +359,7 @@ class Manager {
             }
           }
         }
-      } catch (e) {
+      } catch (e) { // eslint-disable-line no-unused-vars
         Manager._setError(ctx, 'invalid_request', 'invalid value for parameter \'redirect_uri\'');
       }
     } else {
@@ -366,7 +370,7 @@ class Manager {
 
   /**
    * response_type must be valid
-   * @param {Object} ctx
+   * @param {object} ctx context
    */
   static _responseTypeRequired(ctx) {
     ctx.session.responseType = ctx.queryParams['response_type'];
@@ -383,7 +387,7 @@ class Manager {
 
   /**
    * A state parameter must be present
-   * @param {Object} ctx 
+   * @param {object} ctx context
    */
   static _stateRequired(ctx) {
     ctx.session.state = ctx.queryParams['state'];
@@ -397,7 +401,7 @@ class Manager {
 
   /**
    * A code_challenge_method must be present and valid
-   * @param {Object} ctx
+   * @param {object} ctx context
    */
   _codeChallengeMethodRequired(ctx) {
     ctx.session.codeChallengeMethod = ctx.queryParams['code_challenge_method'];
@@ -416,7 +420,7 @@ class Manager {
 
   /**
    * A code_challenge must be present
-   * @param {Object} ctx
+   * @param {object} ctx context
    */
   _codeChallengeRequired(ctx) {
     ctx.session.codeChallenge = ctx.queryParams['code_challenge'];
@@ -435,7 +439,7 @@ class Manager {
 
   /**
    * Scopes may be present, with one known combination limitation
-   * @param {Object} ctx
+   * @param {object} ctx context
    */
   _scopeOptional(ctx) {
     const _scope = _fileScope('_scopeOptional');
@@ -460,14 +464,14 @@ class Manager {
 
   /**
    * Parses me, if provided
-   * @param {Object} ctx
+   * @param {object} ctx context
    */
   async _meOptional(ctx) {
     const me = ctx.queryParams['me'];
     if (me) {
       try {
         ctx.session.me = await this.communication.validateProfile(me);
-      } catch (e) {
+      } catch (e) { // eslint-disable-line no-unused-vars
         ctx.session.me = undefined;
       }
     }
@@ -476,8 +480,8 @@ class Manager {
 
   /**
    * Ensure authenticated identifier matches profile.
-   * @param {Object} ctx
-   * @returns {Boolean}
+   * @param {object} ctx context
+   * @returns {boolean} is valid
    */
   _profileValidForIdentifier(ctx) {
     const _scope = _fileScope('_profileValidForIdentifier');
@@ -493,10 +497,10 @@ class Manager {
 
   /**
    * Get numeric value from form field data.
-   * @param {*} ctx
-   * @param {String} field
-   * @param {String} customField
-   * @returns {Number=}
+   * @param {*} ctx context
+   * @param {string} field field
+   * @param {string} customField custom field
+   * @returns {number=} lifespan
    */
   _parseLifespan(ctx, field, customField) {
     const _scope = _fileScope('_parseLifespan');
@@ -528,8 +532,8 @@ class Manager {
 
   /**
    * Validate any accepted scopes, ensure uniqueness, return as array.
-   * @param {Object} ctx
-   * @returns {String=}
+   * @param {object} ctx context
+   * @returns {string[]} scopes
    */
   _parseConsentScopes(ctx) {
     const _scope = _fileScope('_ingestConsentScopes');
@@ -561,8 +565,8 @@ class Manager {
 
   /**
    * Parse and validate selected me is a valid profile option.
-   * @param {Object} ctx
-   * @returns {URL}
+   * @param {object} ctx context
+   * @returns {URL} url
    */
   _parseConsentMe(ctx) {
     const _scope = _fileScope('_parseConsentMe');
@@ -585,8 +589,8 @@ class Manager {
 
   /**
    * Get up-to-date profile data from selected profile endpoint.
-   * @param {Object} ctx
-   * @returns {Promise<Object>}
+   * @param {object} ctx context
+   * @returns {Promise<object>} profile data
    */
   async _fetchConsentProfileData(ctx) {
     const _scope = _fileScope('_fetchConsentProfileData');
@@ -624,8 +628,8 @@ class Manager {
    *   expires-seconds - optional custom lifespan
    *   refresh - optional refresh lifespan
    *   refresh-seconds - optional custom refresh lifespan
-   * @param {http.ServerResponse} res
-   * @param {Object} ctx 
+   * @param {http.ServerResponse} res response
+   * @param {object} ctx context
    */
   async postConsent(res, ctx) {
     const _scope = _fileScope('postConsent');
@@ -728,8 +732,8 @@ class Manager {
 
   /**
    * Redeem a code for a profile url, and maybe more profile info.
-   * @param {http.ServerResponse} res
-   * @param {Object} ctx 
+   * @param {http.ServerResponse} res response
+   * @param {object} ctx context
    */
   async postAuthorization(res, ctx) {
     const _scope = _fileScope('postAuthorization');
@@ -786,8 +790,8 @@ class Manager {
   /**
    * Ingest an incoming authorization redemption request, parsing fields
    * onto a new session object on the context.
-   * @param {*} dbCtx
-   * @param {Object} ctx
+   * @param {object} ctx context
+   * @returns {Promise<void>}
    */
   async _ingestPostAuthorizationRequest(ctx) {
     const _scope = _fileScope('_ingestPostAuthorizationRequest');
@@ -825,7 +829,7 @@ class Manager {
 
   /**
    * Unpack the session data from provided code overtop of context session ..
-   * @param {Object} ctx
+   * @param {object} ctx context
    */
   async _restoreSessionFromCode(ctx) {
     const _scope = _fileScope('_restoreSessionFromCode');
@@ -873,7 +877,7 @@ class Manager {
 
   /**
    * Ensure provided client_id matches session clientId.
-   * @param {Object} ctx
+   * @param {object} ctx context
    */
   _checkSessionMatchingClientId(ctx) {
     const _scope = _fileScope('_checkSessionMatchingClientId');
@@ -883,7 +887,7 @@ class Manager {
       try {
         clientId = new URL(clientId);
         ctx.session.clientId = new URL(ctx.session.clientId);
-      } catch (e) {
+      } catch (e) { // eslint-disable-line no-unused-vars
         this.logger.debug(_scope, 'un-parsable client_id url', { ctx });
         delete ctx.session.clientId;
         Manager._setError(ctx, 'invalid_request', 'malformed client_id');
@@ -901,7 +905,7 @@ class Manager {
 
 
   /**
-   * @param {Object} ctx
+   * @param {object} ctx context
    */
   _checkSessionMatchingRedirectUri(ctx) {
     const _scope = _fileScope('_checkSessionMatchingClientId');
@@ -911,7 +915,7 @@ class Manager {
       try {
         redirectUri = new URL(redirectUri);
         ctx.session.redirectUri = new URL(ctx.session.redirectUri);
-      } catch (e) {
+      } catch (e) { // eslint-disable-line no-unused-vars
         this.logger.debug(_scope, 'un-parsable redirect_uri url', { ctx });
         delete ctx.session.redirectUri;
         Manager._setError(ctx, 'invalid_request', 'malformed redirect_url');
@@ -930,9 +934,9 @@ class Manager {
 
   /**
    * Validate grant_type, either persist on session or set error.
-   * @param {Object} ctx
-   * @param {String[]} validGrantTypes
-   * @param {Boolean} treatEmptyAs
+   * @param {object} ctx context
+   * @param {string[]} validGrantTypes grant types
+   * @param {string=} treatEmptyAs grant type
    */
   _checkGrantType(ctx, validGrantTypes = ['authorization_code'], treatEmptyAs = 'authorization_code') {
     const _scope = _fileScope('_checkGrantType');
@@ -950,7 +954,7 @@ class Manager {
 
 
   /**
-   * @param {Object} ctx
+   * @param {object} ctx context
    */
   _checkSessionMatchingCodeVerifier(ctx) {
     const _scope = _fileScope('_checkSessionMatchingCodeVerifier');
@@ -981,9 +985,9 @@ class Manager {
 
   /**
    * Attempt to revoke a token.
-   * @param {*} dbCtx
-   * @param {http.ServerResponse} res
-   * @param {Object} ctx
+   * @param {*} dbCtx db context
+   * @param {http.ServerResponse} res response
+   * @param {object} ctx context
    */
   async _revokeToken(dbCtx, res, ctx) {
     const _scope = _fileScope('_revokeToken');
@@ -1039,10 +1043,10 @@ class Manager {
 
   /**
    * Legacy token validation flow.
-   * @param {*} dbCtx
-   * @param {http.ClientRequest} req 
-   * @param {http.ServerResponse} res
-   * @param {Object} ctx
+   * @param {*} dbCtx db context
+   * @param {http.ClientRequest} req request
+   * @param {http.ServerResponse} res response
+   * @param {object} ctx context
    */
   async _validateToken(dbCtx, req, res, ctx) {
     const _scope = _fileScope('_validateToken');
@@ -1075,9 +1079,9 @@ class Manager {
   /**
    * Given a list of newly-requested scopes, return a list of scopes
    * from previousScopes which are not in requestedScopes.
-   * @param {String[]} previousScopes
-   * @param {String[]} requestedScopes
-   * @returns {String[]}
+   * @param {string[]} previousScopes scopes
+   * @param {string[]} requestedScopes scopes
+   * @returns {string[]} scopes
    */
   static _scopeDifference(previousScopes, requestedScopes) {
     const scopesToRemove = [];
@@ -1095,10 +1099,10 @@ class Manager {
 
   /**
    * Redeem a refresh token for a new token.
-   * @param {*} dbCtx
-   * @param {http.ClientRequest} req 
-   * @param {http.ServerResponse} res
-   * @param {Object} ctx
+   * @param {*} dbCtx db context
+   * @param {http.ClientRequest} req request
+   * @param {http.ServerResponse} res response
+   * @param {object} ctx context
    */
   async _refreshToken(dbCtx, req, res, ctx) {
     const _scope = _fileScope('_refreshToken');
@@ -1192,15 +1196,15 @@ class Manager {
 
   /**
    * Generate a new ticket for later redemption.
-   * @param {Object} payload
-   * @param {} payload.subject deliver ticket to this endpoint
-   * @param {} payload.resource url the redeemed ticket is valid for accessing
-   * @param {String[]} payload.scopes list of scopes assigned to ticket
-   * @param {String} payload.identifier user generating ticket
-   * @param {} payload.profile profile of user generating ticket
-   * @param {Number} payload.ticketLifespanSeconds ticket redeemable for this long
-   * @returns {Promise<String>}
-  */
+   * @param {object} payload payload
+   * @param {string} payload.subject deliver ticket to this endpoint
+   * @param {string} payload.resource url the redeemed ticket is valid for accessing
+   * @param {string[]} payload.scopes list of scopes assigned to ticket
+   * @param {string} payload.identifier user generating ticket
+   * @param {string} payload.profile profile of user generating ticket
+   * @param {number} payload.ticketLifespanSeconds ticket redeemable for this long
+   * @returns {Promise<string>} ticket
+   */
   async _mintTicket({ subject, resource, scopes, identifier, profile, ticketLifespanSeconds }) {
     const _scope = _fileScope('_mintTicket');
     this.logger.debug(_scope, 'called', { subject, resource, scopes, identifier, profile, ticketLifespanSeconds });
@@ -1221,19 +1225,19 @@ class Manager {
 
   /**
    * @typedef Ticket
-   * @property {String} codeId
-   * @property {Date} issued
-   * @property {Date} expires
-   * @property {URL} subject
-   * @property {URL} resource
-   * @property {String[]} scopes
-   * @property {String} identifier
-   * @property {URL} profile
+   * @property {string} codeId code id
+   * @property {Date} issued issued at
+   * @property {Date} expires expires at
+   * @property {URL} subject subject
+   * @property {URL} resource resource
+   * @property {string[]} scopes scopes
+   * @property {string} identifier identifier
+   * @property {URL} profile profile
    */
   /**
    * 
-   * @param {String} ticket
-   * @returns {Promise<Ticket>}
+   * @param {string} ticket ticket
+   * @returns {Promise<Ticket>} ticket object
    */
   async _unpackTicket(ticket) {
     const ticketObj = await this.mysteryBox.unpack(ticket);
@@ -1252,10 +1256,11 @@ class Manager {
 
   /**
    * Redeem a ticket for a token.
-   * @param {*} dbCtx
-   * @param {http.ClientRequest} req 
-   * @param {http.ServerResponse} res
-   * @param {Object} ctx
+   * @param {*} dbCtx db context
+   * @param {http.ClientRequest} req request
+   * @param {http.ServerResponse} res response
+   * @param {object} ctx context
+   * @returns {Promise<void>} 
    */
   async _ticketAuthToken(dbCtx, req, res, ctx) {
     const _scope = _fileScope('_ticketAuthToken');
@@ -1310,10 +1315,10 @@ class Manager {
 
   /**
    * Redeem a code for a token.
-   * @param {*} dbCtx
-   * @param {http.ClientRequest} req
-   * @param {http.ServerResponse} res
-   * @param {Object} ctx
+   * @param {*} dbCtx db context
+   * @param {http.ClientRequest} req request
+   * @param {http.ServerResponse} res response
+   * @param {object} ctx context
    */
   async _codeToken(dbCtx, req, res, ctx) {
     const _scope = _fileScope('_codeToken');
@@ -1393,9 +1398,9 @@ class Manager {
 
   /**
    * Issue, refresh, or validate a token.
-   * @param {http.ClientRequest} req 
-   * @param {http.ServerResponse} res
-   * @param {Object} ctx 
+   * @param {http.ClientRequest} req request
+   * @param {http.ServerResponse} res response
+   * @param {object} ctx context
    */
   async postToken(req, res, ctx) {
     const _scope = _fileScope('postToken');
@@ -1451,9 +1456,10 @@ class Manager {
    * Ingest token from authorization header, setting ctx.bearer.isValid appropriately.
    * ctx.bearer not set if auth method not recognized.
    * This is for legacy validation on token endpoint.
-   * @param {*} dbCtx
-   * @param {http.ClientRequest} req
-   * @param {Object} ctx
+   * @param {*} dbCtx db context
+   * @param {http.ClientRequest} req request
+   * @param {object} ctx context
+   * @returns {Promise<void>}
    */
   async _checkTokenValidationRequest(dbCtx, req, ctx) {
     const _scope = _fileScope('_checkTokenValidationRequest');
@@ -1468,7 +1474,7 @@ class Manager {
           };  
           try {
             Object.assign(ctx.bearer, await this.mysteryBox.unpack(authString));
-          } catch (e) {
+          } catch (e) { // eslint-disable-line no-unused-vars
             this.logger.debug(_scope, 'failed to unpack token', { ctx });
             Manager._setError(ctx, 'invalid_request', 'invalid token');
             return;
@@ -1509,9 +1515,9 @@ class Manager {
 
   /**
    * Accept an unsolicited ticket proffering.
-   * @param {http.ClientRequest} req 
-   * @param {http.ServerResponse} res
-   * @param {Object} ctx 
+   * @param {http.ClientRequest} req request
+   * @param {http.ServerResponse} res response
+   * @param {object} ctx context
    */
   async postTicket(req, res, ctx) {
     const _scope = _fileScope('postTicket');
@@ -1528,14 +1534,14 @@ class Manager {
     if (iss) {
       try {
         new URL(iss);
-      } catch (e) {
+      } catch (e) { // eslint-disable-line no-unused-vars
         this.logger.debug(_scope, 'unparsable issuer', { ticket, resource, subject, iss, ctx });
         // continue, will try resource for metadata
       }
     }
     try {
       new URL(resource);
-    } catch (e) {
+    } catch (e) { // eslint-disable-line no-unused-vars
       this.logger.debug(_scope, 'unparsable resource', { ticket, resource, subject, ctx });
       throw new ResponseError(Enum.ErrorResponse.BadRequest);
     }
@@ -1563,10 +1569,14 @@ class Manager {
 
 
   /**
+   * @typedef {object} AMQPChannel
+   * @property {Function} ack ack
+   */
+  /**
    * Process messages from proffered ticket queue.
    * Attempt to redeem ticket and publish to redeemed token queue.
-   * @param {AMQPChannel} channel
-   * @param {Buffer} message
+   * @param {AMQPChannel} channel channel
+   * @param {Buffer} message message
    */
   async queuedTicketProcessor(channel, message) {
     const _scope = _fileScope('queuedTicketProcessor');
@@ -1601,7 +1611,7 @@ class Manager {
     let resourceUrlObj;
     try {
       resourceUrlObj = new URL(resource);
-    } catch (e) {
+    } catch (e) { // eslint-disable-line no-unused-vars
       this.logger.error(_scope, 'unparsable resource, discarding', { payload });
       channel.ack(message);
       return;
@@ -1662,8 +1672,8 @@ class Manager {
 
   /**
    * Validate a token and return data about it.
-   * @param {http.ServerResponse} res
-   * @param {Object} ctx 
+   * @param {http.ServerResponse} res response
+   * @param {object} ctx context
    */
   async postIntrospection(res, ctx) {
     const _scope = _fileScope('postIntrospection');
@@ -1718,8 +1728,8 @@ class Manager {
 
   /**
    * Revoke a token or refresh token.
-   * @param {http.ServerResponse} res
-   * @param {Object} ctx 
+   * @param {http.ServerResponse} res response
+   * @param {object} ctx context
    */
   async postRevocation(res, ctx) {
     const _scope = _fileScope('postRevocation');
@@ -1740,8 +1750,8 @@ class Manager {
 
   /**
    * Profile information for a token.
-   * @param {http.ServerResponse} res
-   * @param {Object} ctx 
+   * @param {http.ServerResponse} res response
+   * @param {object} ctx context
    */
   async postUserInfo(res, ctx) {
     const _scope = _fileScope('postUserInfo');
@@ -1800,8 +1810,8 @@ class Manager {
 
   /**
    * Show admin interface, allowing manipulation of profiles and scopes.
-   * @param {http.ServerResponse} res
-   * @param {Object} ctx 
+   * @param {http.ServerResponse} res response
+   * @param {object} ctx context
    */
   async getAdmin(res, ctx) {
     const _scope = _fileScope('getAdmin');
@@ -1822,8 +1832,8 @@ class Manager {
   
   /**
    * Process admin interface events.
-   * @param {http.ServerResponse} res
-   * @param {Object} ctx 
+   * @param {http.ServerResponse} res response
+   * @param {object} ctx context
    */
   async postAdmin(res, ctx) {
     const _scope = _fileScope('postAdmin');
@@ -1952,8 +1962,8 @@ class Manager {
 
   /**
    * Show ticket proffer interface.
-   * @param {http.ServerResponse} res
-   * @param {Object} ctx 
+   * @param {http.ServerResponse} res response
+   * @param {object} ctx context
    */
   async getAdminTicket(res, ctx) {
     const _scope = _fileScope('getAdminTicket');
@@ -1975,8 +1985,8 @@ class Manager {
 
   /**
    * Handle ticket proffer interface submission.
-   * @param {http.ServerResponse} res
-   * @param {Object} ctx 
+   * @param {http.ServerResponse} res response
+   * @param {object} ctx context
    */
   async postAdminTicket(res, ctx) {
     const _scope = _fileScope('postAdminTicket');
@@ -1992,7 +2002,7 @@ class Manager {
         ].forEach((param) => {
           try {
             ctx[param.ctxProp] = new URL(ctx.parsedBody[param.bodyParam]);
-          } catch (e) {
+          } catch (e) { // eslint-disable-line no-unused-vars
             this.logger.debug(_scope, `invalid ${param.bodyParam}`, { ctx });
             ctx.errors.push(param.err);
           }
@@ -2087,8 +2097,8 @@ class Manager {
   /**
    * Report on generally uninteresting backend information.
    * Also allow a few event invocations.
-   * @param {http.ServerResponse} res
-   * @param {Object} ctx
+   * @param {http.ServerResponse} res response
+   * @param {object} ctx context
    */
   async getAdminMaintenance(res, ctx) {
     const _scope = _fileScope('getAdminMaintenance');
@@ -2125,8 +2135,8 @@ class Manager {
 
   /**
    * 
-   * @param {http.ServerResponse} res
-   * @param {Object} ctx 
+   * @param {http.ServerResponse} res response
+   * @param {object} ctx context
    */
   async getHealthcheck(res, ctx) {
     const _scope = _fileScope('getHealthcheck');

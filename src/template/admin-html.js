@@ -10,11 +10,23 @@ const th = require('./template-helper');
 const { sessionNavLinks } = require('@squeep/authentication-module');
 
 
+/**
+ *
+ * @param {string} profile profile
+ * @returns {string} li
+ */
 function renderProfileLI(profile) {
   return `\t<li><a class="uri" id="${profile}">${profile}</a></li>`;
 }
 
 
+/**
+ *
+ * @param {string} profile profile
+ * @param {string} scope scope
+ * @param {boolean} selected is selected
+ * @returns {string} td
+ */
 function renderProfileScopeIndicator(profile, scope, selected) {
   const checked = selected ? ' checked' : '';
   return `\t\t<td>
@@ -22,6 +34,13 @@ function renderProfileScopeIndicator(profile, scope, selected) {
 \t\t</td>`;
 }
 
+/**
+ *
+ * @param {string} scope scope
+ * @param {object} details details
+ * @param {string[]} profiles profiles
+ * @returns {string} tr
+ */
 function renderScopeRow(scope, details, profiles) {
   return `\t<tr class="scope">
 ${(profiles || []).map((profile) => renderProfileScopeIndicator(profile, scope, details.profiles.includes(profile))).join('\n')}
@@ -37,6 +56,11 @@ ${(profiles || []).map((profile) => renderProfileScopeIndicator(profile, scope, 
 }
 
 
+/**
+ *
+ * @param {string} profile profile
+ * @returns {string} th
+ */
 function renderProfileHeader(profile) {
   return `<th scope="col" class="vertical uri">
 \t\t${profile}
@@ -44,6 +68,12 @@ function renderProfileHeader(profile) {
 }
 
 
+/**
+ *
+ * @param {object} scopeIndex scopes
+ * @param {string[]} profiles profiles
+ * @returns {string} table
+ */
 function scopeIndexTable(scopeIndex, profiles) {
   return `<table>
 <thead>
@@ -61,6 +91,11 @@ ${Object.entries(scopeIndex).sort(th.scopeCompare).map(([scope, details]) => ren
 </table>`;
 }
 
+/**
+ *
+ * @param {object} token token
+ * @returns {string} type
+ */
 function _tokenType(token) {
   if (token.resource) {
     return 'ticket-token';
@@ -71,6 +106,11 @@ function _tokenType(token) {
   return 'token';
 }
 
+/**
+ *
+ * @param {object} token token
+ * @returns {string} tr
+ */
 function renderTokenRow(token) {
   const createdTitle = token.refreshed ? 'Refreshed At' : 'Created At';
   const createdDate = token.refreshed ? token.refreshed : token.created;
@@ -91,12 +131,20 @@ function renderTokenRow(token) {
 \t\t</tr>`;
 }
 
+/**
+ * @returns {string} tr
+ */
 function noTokensRows() {
   return [`\t\t<tr>
 \t\t\t<td colspan="10" class="centered">(No active or recent tokens.)</td>
 \t\t</tr>`];
 }
 
+/**
+ *
+ * @param {object} tokens tokens
+ * @returns {string} table
+ */
 function tokenTable(tokens) {
   const tokenRows = tokens?.length ? tokens.map((token) => renderTokenRow(token)) : noTokensRows();
   const formOpen = tokens?.length ? '<form method="POST">\n' : '';
@@ -122,6 +170,11 @@ ${tokenRows.join('\n')}
 </table>${formClose}`;
 }
 
+/**
+ *
+ * @param {object} ctx context
+ * @returns {string} section
+ */
 function mainContent(ctx) {
   const profileList = (ctx.profilesScopes?.profiles || []).map((p) => renderProfileLI(p)).join('\n');
   return `<section>
@@ -186,16 +239,16 @@ ${tokenTable(ctx.tokens)}
 
 /**
  * 
- * @param {Object} ctx
- * @param {Object} ctx.profilesScopes.scopeIndex
- * @param {String[]} ctx.profilesScopes.profiles
- * @param {Object[]} ctx.tokens
- * @param {Object} options
- * @param {Object} options.manager
- * @param {String} options.manager.pageTitle
- * @param {String} options.manager.logoUrl
- * @param {String[]} options.manager.footerEntries
- * @returns {String}
+ * @param {object} ctx context
+ * @param {object} ctx.profilesScopes.scopeIndex scopes
+ * @param {string[]} ctx.profilesScopes.profiles profiles
+ * @param {object[]} ctx.tokens tokens
+ * @param {object} options options
+ * @param {object} options.manager manager options
+ * @param {string} options.manager.pageTitle page title
+ * @param {string} options.manager.logoUrl logo url
+ * @param {string[]} options.manager.footerEntries footer entries
+ * @returns {string} page
  */
 module.exports = (ctx, options) => {
   const pagePathLevel = 1;

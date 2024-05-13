@@ -4,13 +4,13 @@ const th = require('./template-helper');
 const { sessionNavLinks } = require('@squeep/authentication-module');
 
 /**
- * @param {Object} hApp
- * @param {Object} hApp.properties
- * @param {String[]=} hApp.properties.url
- * @param {String[]=} hApp.properties.summary
- * @param {String[]=} hApp.properties.logo
- * @param {String[]=} hApp.properties.name
- * @returns {String}
+ * @param {object} hApp client identifier h-app
+ * @param {object} hApp.properties properties
+ * @param {string[]=} hApp.properties.url url
+ * @param {string[]=} hApp.properties.summary summary
+ * @param {string[]=} hApp.properties.logo logo
+ * @param {string[]=} hApp.properties.name name
+ * @returns {string} span
  */
 function renderClientIdentifierProperties(hApp) {
   const properties = hApp.properties || {};
@@ -47,9 +47,9 @@ function renderClientIdentifierProperties(hApp) {
 
 
 /**
- * @param {Object} clientIdentifier 
- * @param {Object[]} clientIdentifier.items
- * @returns {String}
+ * @param {object} clientIdentifier client identifier
+ * @param {object[]} clientIdentifier.items items
+ * @returns {string} spans
  */
 function renderClientIdentifier(clientIdentifier) {
   const hAppEntries = clientIdentifier?.items || [];
@@ -58,9 +58,9 @@ function renderClientIdentifier(clientIdentifier) {
 
 
 /**
- * @param {String} profile
- * @param {Boolean} selected
- * @returns {String}
+ * @param {string} profile profile
+ * @param {boolean} selected is selected
+ * @returns {string} option
  */
 function renderProfileOption(profile, selected) {
   return `<option value="${profile}"${selected ? ' selected' : ''}>${profile}</option>`;
@@ -68,9 +68,9 @@ function renderProfileOption(profile, selected) {
 
 
 /**
- * @param {String[]} availableProfiles
- * @param {String} hintProfile
- * @returns {String}
+ * @param {string[]} availableProfiles profiles
+ * @param {string} hintProfile profile
+ * @returns {string} fieldset
  */
 function renderProfileFieldset(availableProfiles, hintProfile) {
   if (!availableProfiles || availableProfiles.length <= 1) {
@@ -93,12 +93,16 @@ ${availableProfiles.map((profile) => renderProfileOption(profile, profile === hi
 
 
 /**
- * @param {ScopeDetails} scope
- * @param {String} scope.scope
- * @param {String} scope.description
- * @param {String[]} scope.profiles
- * @param {Boolean} checked
- * @returns {String}
+ * @typedef {object} ScopeDetails
+ * @property {string} scope scope
+ * @property {string} description description
+ * @property {string[]} profiles profiles
+ */
+
+/**
+ * @param {ScopeDetails} scope scope details
+ * @param {boolean} checked is checked
+ * @returns {string} scope li
  */
 function renderScopeCheckboxLI(scope, checked) {
   let scopeDescription;
@@ -122,6 +126,11 @@ function renderScopeCheckboxLI(scope, checked) {
 }
 
 
+/**
+ *
+ * @param {ScopeDetails[]=} requestedScopes scope details
+ * @returns {string} fieldset
+ */
 function renderRequestedScopes(requestedScopes) {
   if (!requestedScopes?.length) {
     return '';
@@ -140,8 +149,8 @@ ${requestedScopes.map((scopeDetails) => renderScopeCheckboxLI(scopeDetails, true
 }
 
 /**
- * @param {ScopeDetails[]} additionalScopes
- * @returns {String}
+ * @param {ScopeDetails[]} additionalScopes scopes
+ * @returns {string} fieldset
  */
 function renderAdditionalScopes(additionalScopes) {
   const parts = [];
@@ -173,6 +182,8 @@ ${additionalScopes.map((scopeDetails) => renderScopeCheckboxLI(scopeDetails, fal
 
 /**
  * 
+ * @param {string[]} requestedScopes scopes
+ * @returns {string} fieldset
  */
 function renderExpiration(requestedScopes) {
   const tokenableScopes = requestedScopes.filter((s) => !['profile', 'email'].includes(s));
@@ -215,6 +226,15 @@ function renderExpiration(requestedScopes) {
 \t</fieldset>`;
 }
 
+/**
+ *
+ * @param {string} name name
+ * @param {string} value value
+ * @param {string} label label
+ * @param {boolean} checked is checked
+ * @param {number} indent indent
+ * @returns {string} div
+ */
 function radioButton(name, value, label, checked = false, indent = 0) {
   const id = `${name}-${value}`;
   return th.indented(indent, [
@@ -226,26 +246,30 @@ function radioButton(name, value, label, checked = false, indent = 0) {
 }
 
 /**
+ * @alias {object} ScopeIndex
+ */
+
+/**
  * 
- * @param {Object} ctx
- * @param {Object[]} ctx.notifications
- * @param {Object} ctx.session
- * @param {String[]=} ctx.session.scope
- * @param {URL=} ctx.session.me
- * @param {String[]} ctx.session.profiles
- * @param {ScopeIndex} ctx.session.scopeIndex
- * @param {Object} ctx.session.clientIdentifier
- * @param {Object[]} ctx.session.clientIdentifier.items
- * @param {Object} ctx.session.clientIdentifier.items.properties
- * @param {String[]=} ctx.session.clientIdentifier.items.properties.url
- * @param {String[]=} ctx.session.clientIdentifier.items.properties.summary
- * @param {String[]=} ctx.session.clientIdentifier.items.properties.logo
- * @param {String[]=} ctx.session.clientIdentifier.items.properties.name
- * @param {String} ctx.session.clientId
- * @param {String} ctx.session.persist
- * @param {String} ctx.session.redirectUri
- * @param {Object} options
- * @returns {String}
+ * @param {object} ctx context
+ * @param {object[]} ctx.notifications notifications
+ * @param {object} ctx.session session
+ * @param {string[]=} ctx.session.scope scopes
+ * @param {URL=} ctx.session.me profile
+ * @param {string[]} ctx.session.profiles profiles
+ * @param {ScopeIndex} ctx.session.scopeIndex scopes structure
+ * @param {object} ctx.session.clientIdentifier client identifier
+ * @param {object[]} ctx.session.clientIdentifier.items items
+ * @param {object} ctx.session.clientIdentifier.items.properties properties
+ * @param {string[]=} ctx.session.clientIdentifier.items.properties.url url
+ * @param {string[]=} ctx.session.clientIdentifier.items.properties.summary sumamry
+ * @param {string[]=} ctx.session.clientIdentifier.items.properties.logo logo
+ * @param {string[]=} ctx.session.clientIdentifier.items.properties.name name
+ * @param {string} ctx.session.clientId client id
+ * @param {string} ctx.session.persist persist
+ * @param {string} ctx.session.redirectUri redirect
+ * @param {object} options options
+ * @returns {string} section
  */
 function mainContent(ctx, options) { // eslint-disable-line no-unused-vars
   const session = ctx.session || {};
@@ -283,7 +307,7 @@ function mainContent(ctx, options) { // eslint-disable-line no-unused-vars
 
   return [
     `<section class="information">
-\tThe application client ${renderClientIdentifier(session.clientIdentifier)} at <a class="uri" aria-label="client-identifier" id="${session.clientId}">${session.clientId}</a> would like to identify you as <a class="uri" aria-label="profile"${hintedProfile ? ' id="' + hintedProfile + '"' : ''}>${hintedProfile ? hintedProfile : '(unspecified)'}</a>.
+\tThe application client ${renderClientIdentifier(session.clientIdentifier)} at <a class="uri" aria-label="client-identifier" id="${session.clientId}">${session.clientId}</a> would like to identify you as <a class="uri" aria-label="profile"${hintedProfile ? ' id="' + hintedProfile + '"' : ''}>${hintedProfile || '(unspecified)'}</a>.
 </section>
 <section class="choices">
 \t<form action="consent" method="POST" class="form-consent">`,
@@ -310,21 +334,21 @@ function mainContent(ctx, options) { // eslint-disable-line no-unused-vars
 
 /**
  * 
- * @param {Object} ctx
- * @param {Object} ctx.session
- * @param {String[]=} ctx.session.scope
- * @param {URL=} ctx.session.me
- * @param {String[]} ctx.session.profiles
- * @param {ScopeIndex} ctx.session.scopeIndex
- * @param {Object} ctx.session.clientIdentifier
- * @param {String} ctx.session.clientId
- * @param {String} ctx.session.persist
- * @param {String} ctx.session.redirectUri
- * @param {Object} options
- * @param {Object} options.manager
- * @param {String} options.manager.pageTitle
- * @param {String} options.manager.footerEntries
- * @returns {String}
+ * @param {object} ctx context
+ * @param {object} ctx.session session object
+ * @param {string[]=} ctx.session.scope scopes
+ * @param {URL=} ctx.session.me url
+ * @param {string[]} ctx.session.profiles profiles
+ * @param {ScopeIndex} ctx.session.scopeIndex scopes structure
+ * @param {object} ctx.session.clientIdentifier client identifier
+ * @param {string} ctx.session.clientId client id
+ * @param {string} ctx.session.persist persist
+ * @param {string} ctx.session.redirectUri redirect url
+ * @param {object} options options
+ * @param {object} options.manager manager options
+ * @param {string} options.manager.pageTitle page title
+ * @param {string} options.manager.footerEntries footer entries
+ * @returns {string} page
  */
 module.exports = (ctx, options) => {
   const pagePathLevel = 0;

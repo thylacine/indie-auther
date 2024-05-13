@@ -1,6 +1,6 @@
 'use strict';
 
-const { StubLogger: Base } = require('@squeep/test-helper'); // eslint-disable-line node/no-unpublished-require
+const { StubLogger: Base } = require('@squeep/test-helper');
 
 
 class StubLogger extends Base {

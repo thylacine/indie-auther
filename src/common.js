@@ -8,9 +8,9 @@ const randomBytesAsync = promisify(randomBytes);
 
 /**
  * Limit length of string to keep logs sane
- * @param {String} str
- * @param {Number} len
- * @returns {String}
+ * @param {string} str str
+ * @param {number} len len
+ * @returns {string} str
  */
 const logTruncate = (str, len) => {
   if (typeof str !== 'string' || str.toString().length <= len) {
@@ -21,9 +21,9 @@ const logTruncate = (str, len) => {
 
 /**
  * Turn a snake into a camel.
- * @param {String} snakeCase
- * @param {String|RegExp} delimiter
- * @returns {String}
+ * @param {string} snakeCase snake case
+ * @param {string | RegExp} delimiter delimiter
+ * @returns {string} camel case
  */
 const camelfy = (snakeCase, delimiter = '_') => {
   if (!snakeCase || typeof snakeCase.split !== 'function') {
@@ -38,7 +38,8 @@ const camelfy = (snakeCase, delimiter = '_') => {
 
 /**
  * Return an array containing x if x is not an array.
- * @param {*} x
+ * @param {*} x x
+ * @returns {any[]} x[]
  */
 const ensureArray = (x) => {
   if (x === undefined) {
@@ -52,8 +53,8 @@ const ensureArray = (x) => {
 
 /**
  * Recursively freeze an object.
- * @param {Object} o 
- * @returns {Object}
+ * @param {object} o obj
+ * @returns {object} frozen obj
  */
 const freezeDeep = (o) => {
   Object.freeze(o);
@@ -68,9 +69,13 @@ const freezeDeep = (o) => {
 };
 
 
-/** Oauth2.1 §3.2.3.1
+/**
+ * Oauth2.1 §3.2.3.1
  * %x20-21 / %x23-5B / %x5D-7E
- * @param {String} char
+ * ' '-'!' / '#'-'[' / ']'-'~'
+ * not allowed: control characters, '"', '\'
+ * @param {string} char character
+ * @returns {boolean} is valid
  */
 const validErrorChar = (char) => {
   const value = char.charCodeAt(0);
@@ -82,8 +87,8 @@ const validErrorChar = (char) => {
 
 /**
  * Determine if an OAuth error message is valid.
- * @param {String} error
- * @returns {Boolean}
+ * @param {string} error error
+ * @returns {boolean} is valid
  */
 const validError = (error) => {
   return error && error.split('').filter((c) => !validErrorChar(c)).length === 0 || false;
@@ -93,7 +98,8 @@ const validError = (error) => {
 /**
  * OAuth2.1 §3.2.2.1
  * scope-token = 1*( %x21 / %x23-5B / %x5D-7E )
- * @param {String} char
+ * @param {string} char char
+ * @returns {boolean} is valid
  */
 const validScopeChar = (char) => {
   const value = char.charCodeAt(0);
@@ -105,8 +111,8 @@ const validScopeChar = (char) => {
 
 /**
  * Determine if a scope has a valid name.
- * @param {String} scope
- * @returns {Boolean}
+ * @param {string} scope scope
+ * @returns {boolean} is valid
  */
 const validScope = (scope) => {
   return scope && scope.split('').filter((c) => !validScopeChar(c)).length === 0 || false;
@@ -115,7 +121,8 @@ const validScope = (scope) => {
 
 /**
  * 
- * @param {Number} bytes
+ * @param {number} bytes bytes
+ * @returns {string} base64 random string
  */
 const newSecret = async (bytes = 64) => {
   return (await randomBytesAsync(bytes * 3 / 4)).toString('base64');
@@ -124,8 +131,8 @@ const newSecret = async (bytes = 64) => {
 
 /**
  * Convert a Date object to epoch seconds.
- * @param {Date=} date
- * @returns {Number}
+ * @param {Date=} date date
+ * @returns {number} epoch
  */
 const dateToEpoch = (date) => {
   const dateMs = date ? date.getTime() : Date.now();
@@ -139,9 +146,15 @@ const omit = (o, props) => {
 
 
 /**
+ * @typedef {object} ConsoleLike
+ * @property {Function} debug log debug
+ */
+
+/**
  * Log Mystery Box statistics events.
- * @param {Console} logger
- * @param {String} scope
+ * @param {ConsoleLike} logger logger instance
+ * @param {string} scope scope
+ * @returns {Function} stat logger
  */
 const mysteryBoxLogger = (logger, scope) => {
   return (s) => {

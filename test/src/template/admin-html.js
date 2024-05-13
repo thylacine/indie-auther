@@ -1,4 +1,4 @@
-/* eslint-env mocha */
+/* eslint-disable sonarjs/no-duplicate-string */
 'use strict';
 
 const assert = require('assert');

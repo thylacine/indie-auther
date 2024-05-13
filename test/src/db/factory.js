@@ -2,7 +2,7 @@
 'use strict';
 
 const assert = require('assert');
-const sinon = require('sinon'); // eslint-disable-line node/no-unpublished-require
+const sinon = require('sinon');
 const Logger = require('@squeep/logger-json-console');
 const DB = require('../../../src/db');
 const DBErrors = require('../../../src/db/errors');

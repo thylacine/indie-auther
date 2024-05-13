@@ -5,8 +5,8 @@ const { TemplateHelper } = require('@squeep/html-template-helper');
 
 /**
  * Escape a string to be suitable as a CSS name.
- * @param {String} unsafeName 
- * @returns {String}
+ * @param {string} unsafeName unsafe name
+ * @returns {string} escaped name
  */
 function escapeCSS(unsafeName) {
   return unsafeName.replace(/([^0-9a-zA-Z-])/g, '\\$1');
@@ -18,9 +18,9 @@ function escapeCSS(unsafeName) {
  * return the comparison between the two, for sorting.
  * Scopes are sorted such that they are grouped by application, then name.
  * Empty applications are sorted ahead of extant applications.
- * @param {Array} a
- * @param {Array} b
- * @returns {Number}
+ * @param {[string, object]} a [scopeName, scopeDetails]
+ * @param {[string, object]} b [scopeName, scopeDetails]
+ * @returns {number} comparison
  */
 function scopeCompare([aScope, aDetails], [bScope, bDetails]) {
   const { application: aApp } = aDetails;
@@ -49,9 +49,9 @@ function scopeCompare([aScope, aDetails], [bScope, bDetails]) {
 
 /**
  * Populate common navLinks for page templates.
- * @param {Number} pagePathLevel
- * @param {Object} ctx 
- * @param {Object} options 
+ * @param {number} pagePathLevel depth from root
+ * @param {object} ctx context
+ * @param {object} options options
  */
 function navLinks(pagePathLevel, ctx, options) {
   if (!options.navLinks) {

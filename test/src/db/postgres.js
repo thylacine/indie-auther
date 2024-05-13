@@ -1,12 +1,10 @@
-/* eslint-disable sonarjs/no-identical-functions */
-/* eslint-env mocha */
 /* eslint-disable sonarjs/no-duplicate-string */
 'use strict';
 
 /* This provides implementation coverage, stubbing pg-promise. */
 
 const assert = require('assert');
-const sinon = require('sinon'); // eslint-disable-line node/no-unpublished-require
+const sinon = require('sinon');
 const StubLogger = require('../../stub-logger');
 const StubDatabase = require('../../stub-db');
 const DB = require('../../../src/db/postgres');
@@ -281,7 +279,7 @@ describe('DatabasePostgres', function () {
       assert(db.db.batch.called);
     });
     it('failure', async function () {
-      sinon.stub(db.db, 'tx').rejects(expectedException)
+      sinon.stub(db.db, 'tx').rejects(expectedException);
       await assert.rejects(() => db._purgeTables(true), expectedException);
     });
   }); // _purgeTables
@@ -318,7 +316,7 @@ describe('DatabasePostgres', function () {
     let event, date;
     beforeEach(function () {
       event = 'test_event';
-      date = new Date('Fri Dec 22 03:27 UTC 2023')
+      date = new Date('Fri Dec 22 03:27 UTC 2023');
     });
     it('success', async function () {
       const dbResult = {
@@ -823,7 +821,7 @@ describe('DatabasePostgres', function () {
         duration: 22,
       };
       sinon.stub(db.db, 'result').resolves(dbResult);
-      await db.resourceUpsert(dbCtx, resourceId, secret, description)
+      await db.resourceUpsert(dbCtx, resourceId, secret, description);
     });
     it('failure', async function () {
       const dbResult = {

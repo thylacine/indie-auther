@@ -1,8 +1,7 @@
-/* eslint-env mocha */
 'use strict';
 
 const assert = require('assert');
-const sinon = require('sinon'); // eslint-disable-line node/no-unpublished-require
+const sinon = require('sinon');
 const fs = require('fs');
 const svh = require('../../../src/db/schema-version-helper');
 
@@ -121,6 +120,7 @@ describe('SchemaVersionHelper', function () {
         .onCall(i++).returns(notDir) // 'init.sql'
         .onCall(i++).returns(isDir).onCall(i++).returns(isMig) // '1.0.1'
         .onCall(i++).returns(isDir).onCall(i++).returns(isMig) // '1.0.0'
+      ;
       const result = svh.allSchemaVersions('path');
       assert.deepStrictEqual(result, expected);
     });
@@ -151,6 +151,7 @@ describe('SchemaVersionHelper', function () {
         .onCall(i++).returns(notDir) // 'init.sql'
         .onCall(i++).returns(isDir).onCall(i++).returns(isMig) // '1.0.1'
         .onCall(i++).returns(isDir).onCall(i++).returns(isMig) // '1.0.0'
+      ;
       const result = svh.unappliedSchemaVersions('path', current, supported);
       assert.deepStrictEqual(result, expected);
     });

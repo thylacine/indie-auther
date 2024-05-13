@@ -5,15 +5,15 @@ const { sessionNavLinks } = require('@squeep/authentication-module');
 
 /**
  * 
- * @param {Object} ctx
- * @param {Object} ctx.session
- * @param {String=} ctx.session.error
- * @param {String[]=} ctx.session.errorDescriptions
- * @param {Object} options
- * @param {Object} options.manager
- * @param {String} options.manager.pageTitle
- * @param {String} options.manager.footerEntries
- * @returns {String}
+ * @param {object} ctx context
+ * @param {object} ctx.session session
+ * @param {string=} ctx.session.error errors
+ * @param {string[]=} ctx.session.errorDescriptions errors
+ * @param {object} options options
+ * @param {object} options.manager manager options
+ * @param {string} options.manager.pageTitle page title
+ * @param {string} options.manager.footerEntries footer entries
+ * @returns {string} page
  */
 module.exports = (ctx, options) => {
   const pagePathLevel = 0;

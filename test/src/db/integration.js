@@ -1,5 +1,4 @@
-/* eslint-env mocha */
-/* eslint-disable sonarjs/no-identical-functions */
+/* eslint-disable security/detect-object-injection */
 'use strict';
 
 /**
@@ -17,7 +16,7 @@
  */
 
 const assert = require('assert');
-const { step } = require('mocha-steps'); // eslint-disable-line node/no-unpublished-require
+const { step } = require('mocha-steps');
 const StubLogger = require('../../stub-logger');
 // const DBErrors = require('../../../src/db/errors');
 // const testData = require('../../test-data/db-integration');

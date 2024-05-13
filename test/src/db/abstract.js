@@ -1,8 +1,8 @@
-/* eslint-env mocha */
+/* eslint-disable sonarjs/no-duplicate-string */
 'use strict';
 
 const assert = require('assert');
-const sinon = require('sinon'); // eslint-disable-line node/no-unpublished-require
+const sinon = require('sinon');
 
 const StubDatabase = require('../../stub-db');
 const StubLogger = require('../../stub-logger');

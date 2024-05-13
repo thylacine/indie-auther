@@ -2,9 +2,9 @@
 
 /**
  * Scrub credential from POST login body data.
- * @param {Object} data
- * @param {Boolean} sanitize
- * @returns {Boolean}
+ * @param {object} data data
+ * @param {boolean} sanitize do sanitize
+ * @returns {boolean} did/would sanitize
  */
 function sanitizePostCredential(data, sanitize = true) {
   let unclean = false;
@@ -29,9 +29,9 @@ function sanitizePostCredential(data, sanitize = true) {
 
 /**
  * Scrub sensitive data from context.
- * @param {Object} data
- * @param {Boolean} sanitize
- * @returns {Boolean}
+ * @param {object} data data
+ * @param {boolean} sanitize do sanitize
+ * @returns {boolean} did/would sanitize
  */
 function sanitizeContext(data, sanitize = true) {
   let unclean = false;
@@ -78,8 +78,9 @@ function sanitizeContext(data, sanitize = true) {
  * Reduce logged data about scopes from profilesScopes.
  * For all referenced scopes, only include profiles list.
  * Remove scopes without profile references from scopeIndex.
- * @param {Object} data
- * @param {Boolean} sanitize
+ * @param {object} data data
+ * @param {boolean} sanitize do sanitize
+ * @returns {boolean} did/would sanitize
  */
 function reduceScopeVerbosity(data, sanitize = true) {
   let unclean = false;
@@ -114,8 +115,8 @@ function reduceScopeVerbosity(data, sanitize = true) {
 
 /**
  * Return any scope entries on an object, and whether sanitization is needed.
- * @param {Object=} obj
- * @returns {Object}
+ * @param {object=} obj obj
+ * @returns {object} obj
  */
 const _scopesFrom = (obj) => {
   const scopesEntries = Object.entries(obj?.scopeIndex || {});
@@ -130,21 +131,21 @@ const _scopesFrom = (obj) => {
 
 
 /**
- * @typedef {[String, Object]} ScopeEntry
+ * @typedef {[string, object]} ScopeEntry
  */
 /**
  * Return new list of entries with scrubbed scopeDetails.
- * @param {ScopeEntry[]} entries
- * @returns {ScopeEntry[]}
+ * @param {ScopeEntry[]} entries entries
+ * @returns {ScopeEntry[]} entries
  */
 const _scopeEntriesScrubber = (entries) => entries.map(([scopeName, scopeDetails]) => ([scopeName, { profiles: scopeDetails.profiles }]));
 
 
 /**
  * Create a new profilesScopes type object with scrubbed scope details.
- * @param {ScopeEntry[]} scopesEntries
- * @param {ScopeEntry[]} profilesEntries
- * @returns {Object}
+ * @param {ScopeEntry[]} scopesEntries entries
+ * @param {ScopeEntry[]} profilesEntries entries
+ * @returns {object} profilesScopes
  */
 const _sanitizeProfilesScopes = (scopesEntries, profilesEntries) => {
   const referencedScopesEntries = scopesEntries.filter(([_scopeName, scopeDetails]) => scopeDetails?.profiles?.length); // eslint-disable-line no-unused-vars

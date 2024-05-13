@@ -1,12 +1,10 @@
-/* eslint-disable sonarjs/no-identical-functions */
-/* eslint-env mocha */
 /* eslint-disable sonarjs/no-duplicate-string */
 'use strict';
 
 /* This provides implementation coverage, stubbing parts of better-sqlite3. */
 
 const assert = require('assert');
-const sinon = require('sinon'); // eslint-disable-line node/no-unpublished-require
+const sinon = require('sinon');
 const StubDatabase = require('../../stub-db');
 const StubLogger = require('../../stub-logger');
 const DB = require('../../../src/db/sqlite');
@@ -112,7 +110,7 @@ describe('DatabaseSQLite', function () {
       db._optimize();
       assert(db.db.pragma.called);
       assert(db.statement._optimize.all.called);
-      assert.strictEqual(db.changesSinceLastOptimize, 0n)
+      assert.strictEqual(db.changesSinceLastOptimize, 0n);
     });
   }); // _optimize
 
@@ -220,7 +218,7 @@ describe('DatabaseSQLite', function () {
     let event, date, dbResult;
     beforeEach(function () {
       event = 'test_event';
-      date = new Date('Fri Dec 22 03:27 UTC 2023')
+      date = new Date('Fri Dec 22 03:27 UTC 2023');
       sinon.stub(db.statement.almanacUpsert, 'run');
       dbResult = {
         changes: 1,
@@ -574,7 +572,7 @@ describe('DatabaseSQLite', function () {
         expires: new Date(refreshResponse.expires * 1000),
         refreshExpires: new Date(refreshResponse.refreshExpires * 1000),
         scopes: ['blah'],
-      }
+      };
       const response = db.refreshCode(dbCtx, codeId, refreshed, removeScopes);
       assert.deepStrictEqual(response, expectedResponse);
     });
@@ -584,7 +582,7 @@ describe('DatabaseSQLite', function () {
       const expectedResponse = {
         expires: new Date(refreshResponse.expires * 1000),
         refreshExpires: new Date(refreshResponse.refreshExpires * 1000),
-      }
+      };
       removeScopes = [];
       const response = db.refreshCode(dbCtx, codeId, refreshed, removeScopes);
       assert.deepStrictEqual(response, expectedResponse);
@@ -596,7 +594,7 @@ describe('DatabaseSQLite', function () {
         expires: new Date(refreshResponse.expires * 1000),
         refreshExpires: new Date(refreshResponse.refreshExpires * 1000),
         scopes: [],
-      }
+      };
       const response = db.refreshCode(dbCtx, codeId, refreshed, removeScopes);
       assert.deepStrictEqual(response, expectedResponse);
     });
@@ -723,7 +721,7 @@ describe('DatabaseSQLite', function () {
       sinon.stub(db.statement.scopeInUse, 'get');
       dbGetResult = {
         inUse: false,
-      }
+      };
       sinon.stub(db.statement.scopeDelete, 'run');
       dbRunResult = {
         changes: 1,
@@ -898,7 +896,7 @@ describe('DatabaseSQLite', function () {
     let dbResult, codeId;
     beforeEach(function () {
       codeId = '2f226616-3e79-11ec-ad0f-0025905f714a';
-      sinon.stub(db.statement.tokenRevokeByCodeId, 'run')
+      sinon.stub(db.statement.tokenRevokeByCodeId, 'run');
       dbResult = {
         changes: 1,
         lastInsertRowid: undefined,
@@ -1049,7 +1047,7 @@ describe('DatabaseSQLite', function () {
       const dbResultAlmanac = {
         ...dbResult,
         changes: 0,
-      }
+      };
       db.statement.ticketTokenPublished.run.returns(dbResult);
       db.statement.almanacUpsert.run.returns(dbResultAlmanac);
       assert.throws(() => db.ticketTokenPublished(dbCtx, redeemedData), DBErrors.UnexpectedResult);

@@ -3,6 +3,11 @@
 const th = require('./template-helper');
 const { sessionNavLinks } = require('@squeep/authentication-module');
 
+/**
+ *
+ * @param {object} entry entry
+ * @returns {string} tr
+ */
 function renderAlmanacRow(entry) {
   const { event, date } = entry;
   return `<tr>
@@ -11,6 +16,11 @@ function renderAlmanacRow(entry) {
 </tr>`;
 }
 
+/**
+ *
+ * @param {object[]} almanac entries
+ * @returns {string} section
+ */
 function almanacSection(almanac) {
   return `<section>
 \t<h2>Almanac</h2>
@@ -28,6 +38,12 @@ ${almanac.map((entry) => renderAlmanacRow(entry)).join('\n')}
 </section>`;
 }
 
+/**
+ *
+ * @param {string} choreName name
+ * @param {object} choreDetails details
+ * @returns {string} tr
+ */
 function renderChoreRow(choreName, choreDetails) {
   const { intervalMs, nextSchedule } = choreDetails;
   return `<tr>
@@ -37,6 +53,11 @@ function renderChoreRow(choreName, choreDetails) {
 </tr>`;
 }
 
+/**
+ *
+ * @param {object} chores chores
+ * @returns {string} section
+ */
 function choresSection(chores) {
   return `<section>
 \t<h2>Chores</h2>
@@ -57,15 +78,14 @@ ${Object.entries(chores).map((chore) => renderChoreRow(...chore)).join('\n')}
 
 /**
  * 
- * @param {Object} ctx
- * @param {Object[]} ctx.almanac
- * @param {Object} ctx.chores
- * @param {Object} options
- * @param {Object} options.manager
- * @param {String} options.manager.pageTitle
- * @param {String[]} options.manager.footerEntries
- * @param {String} options.adminContactHTML
- * @returns {String}
+ * @param {object} ctx context
+ * @param {object[]} ctx.almanac entries
+ * @param {object} ctx.chores chores
+ * @param {object} options options
+ * @param {object} options.manager manager options
+ * @param {string} options.manager.pageTitle page title
+ * @param {string[]} options.manager.footerEntries footer entires
+ * @returns {string} page
  */
 module.exports = (ctx, options) => {
   const pagePathLevel = 1;

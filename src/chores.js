@@ -23,7 +23,7 @@ class Chores extends BaseChores {
 
   /**
    * Attempt to remove tokens which are expired or otherwise no longer valid.
-   * @param {Number} atLeastMsSinceLast
+   * @param {number} atLeastMsSinceLast minimum clean period
    */
   async cleanTokens(atLeastMsSinceLast = this.options?.chores?.tokenCleanupMs || 0) {
     const _scope = _fileScope('cleanTokens');
@@ -47,7 +47,7 @@ class Chores extends BaseChores {
 
   /**
    * Attempt to remove ephemeral scopes which are no longer referenced by tokens.
-   * @param {Number} atLeastMsSinceLast
+   * @param {number} atLeastMsSinceLast minimum clean period
    */
   async cleanScopes(atLeastMsSinceLast = this.options?.chores?.scopeCleanupMs || 0) {
     const _scope = _fileScope('cleanScopes');

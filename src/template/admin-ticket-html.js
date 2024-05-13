@@ -8,10 +8,20 @@ const th = require('./template-helper');
 const { sessionNavLinks } = require('@squeep/authentication-module');
 
 
+/**
+ *
+ * @param {string} profile profile
+ * @returns {string} option
+ */
 function renderProfileOption(profile) {
   return `<option value="${profile}">${profile}</option>`;
 }
 
+/**
+ *
+ * @param {string} scope scope
+ * @returns {string} tr
+ */
 function renderScopeCheckboxTR(scope) {
   const defaultChecked = ['read'];
   const checked = defaultChecked.includes(scope) ? ' checked' : '';
@@ -21,6 +31,11 @@ function renderScopeCheckboxTR(scope) {
 </tr>`;
 }
 
+/**
+ *
+ * @param {object} ctx context
+ * @returns {string} section
+ */
 function mainContent(ctx) {
   const profileOptions = th.indented(4, (ctx?.profilesScopes?.profiles || []).map((profile) => renderProfileOption(profile)))
     .join('\n');
@@ -71,15 +86,15 @@ ${scopesCheckboxRows}
 
 /**
  * 
- * @param {Object} ctx
- * @param {Object} ctx.profilesScopes.scopeIndex
- * @param {String[]} ctx.profileScopes.profiles
- * @param {Object} options
- * @param {Object} options.manager
- * @param {String} options.manager.pageTitle
- * @param {String} options.manager.logoUrl
- * @param {String[]} options.manager.footerEntries
- * @returns {String}
+ * @param {object} ctx context
+ * @param {object} ctx.profilesScopes.scopeIndex scopes structure
+ * @param {string[]} ctx.profileScopes.profiles profile
+ * @param {object} options options
+ * @param {object} options.manager manager options
+ * @param {string} options.manager.pageTitle page title
+ * @param {string} options.manager.logoUrl logo url
+ * @param {string[]} options.manager.footerEntries footer entries
+ * @returns {string} page
  */
 module.exports = (ctx, options) => {
   const pagePathLevel = 1;
