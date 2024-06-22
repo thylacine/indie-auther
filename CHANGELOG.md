@@ -2,7 +2,7 @@
 
 Releases and notable changes to this project are documented here.
 
-## [v1.2.0] - TBD
+## [v1.2.0] - 2024-06-22
 
 - Add UI for changing password, supporting OTP for auth
 - Updated dependencies.

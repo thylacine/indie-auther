@@ -1,6 +1,6 @@
 {
   "name": "@squeep/indie-auther",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "A stand-alone IndieAuth identity-provider service, for most of your IndieAuth endpoint needs.",
   "keywords": [
     "IdP",
