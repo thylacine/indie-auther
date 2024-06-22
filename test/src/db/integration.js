@@ -18,8 +18,6 @@
 const assert = require('assert');
 const { step } = require('mocha-steps');
 const StubLogger = require('../../stub-logger');
-// const DBErrors = require('../../../src/db/errors');
-// const testData = require('../../test-data/db-integration');
 
 describe('Database Integration', function () {
   const implementations = [];

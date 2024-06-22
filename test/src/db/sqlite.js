@@ -1,4 +1,3 @@
-/* eslint-disable sonarjs/no-duplicate-string */
 'use strict';
 
 /* This provides implementation coverage, stubbing parts of better-sqlite3. */

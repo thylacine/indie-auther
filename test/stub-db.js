@@ -1,8 +1,13 @@
 'use strict';
 
 const { StubDatabase: Base } = require('@squeep/test-helper');
+const sinon = require('sinon');
 
 class StubDatabase extends Base {
+  constructor() {
+    super(sinon);
+  }
+
   get _stubFns() {
     return [
       ...super._stubFns,
