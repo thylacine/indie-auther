@@ -2,6 +2,8 @@
 
 Releases and notable changes to this project are documented here.
 
+## [unreleased] - TBD
+
 ## [v1.2.0] - 2024-06-22
 
 - Add UI for changing password, supporting OTP for auth
@@ -37,7 +39,8 @@ Releases and notable changes to this project are documented here.
 
 ---
 
-[Unreleased]: https://git.squeep.com/?p=squeep-indie-auther;a=commitdiff;h=HEAD;hp=v1.1.0
+[Unreleased]: https://git.squeep.com/?p=squeep-indie-auther;a=commitdiff;h=HEAD;hp=v1.2.0
+[v1.2.0]: https://git.squeep.com/?p=squeep-indie-auther;a=commitdiff;h=v1.2.0;hp=v1.1.0
 [v1.1.0]: https://git.squeep.com/?p=squeep-indie-auther;a=commitdiff;h=v1.1.0;hp=v1.0.3
 [v1.0.3]: https://git.squeep.com/?p=squeep-indie-auther;a=commitdiff;h=v1.0.3;hp=v1.0.2
 [v1.0.2]: https://git.squeep.com/?p=squeep-indie-auther;a=commitdiff;h=v1.0.2;hp=v1.0.1
