@@ -54,6 +54,9 @@ class Manager {
   }
 
 
+  /**
+   * Establish AMQP connection and plumbing.
+   */
   async _connectQueues() {
     await this.queuePublisher.connect();
     await this.queuePublisher.establishAMQPPlumbing(this.options.queues.ticketPublishName);
@@ -1766,7 +1769,7 @@ class Manager {
     }
 
     try {
-      ctx.token = await this.mysteryBox.unpack(ctx.parsedBody['token']);
+      ctx.token = await this.mysteryBox.unpack(token);
     } catch (e) {
       this.logger.debug(_scope, 'failed to unpack token', { error: e, ctx });
     }

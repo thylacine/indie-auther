@@ -62,6 +62,39 @@ describe('Service', function () {
     assert(service);
   });
 
+  describe('_route', function () {
+    it('returns route', function () {
+      const r = service._route('admin');
+      assert.strictEqual(r, '/admin');
+    });
+    it('returns trailing-slash route', function () {
+      const r = service._route('admin', '');
+      assert.strictEqual(r, '/admin/');
+    });
+    it('returns route with trailer', function () {
+      const r = service._route('admin', ':id');
+      assert.strictEqual(r, '/admin/:id');
+    });
+  }); // _route
+
+  describe('_routeExternal', function () {
+    beforeEach(function () {
+      service.options.dingus.proxyPrefix = '/prefix';
+    });
+    it('returns route', function () {
+      const r = service._routeExternal('admin');
+      assert.strictEqual(r, '/prefix/admin');
+    });
+    it('returns trailing-slash route', function () {
+      const r = service._routeExternal('admin', '');
+      assert.strictEqual(r, '/prefix/admin/');
+    });
+    it('returns route with trailer', function () {
+      const r = service._routeExternal('admin', ':id');
+      assert.strictEqual(r, '/prefix/admin/:id');
+    });
+  }); // _routeExternal
+
   describe('initialize', function () {
     it('covers', async function () {
       await service.initialize();

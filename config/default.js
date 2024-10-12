@@ -28,6 +28,7 @@ const defaultOptions = {
 
   // The terminal portions of API route path endpoints.
   route: {
+    static: 'static',
     authorization: 'auth',
     consent: 'consent',
     healthcheck: 'healthcheck',
@@ -37,6 +38,12 @@ const defaultOptions = {
     ticket: 'ticket',
     token: 'token',
     userinfo: 'userinfo',
+    admin: 'admin',
+    'admin-ticket': 'admin/ticket',
+    'admin-maintenance': 'admin/maintenance',
+    'auth-login': 'admin/login',
+    'auth-logout': 'admin/logout',
+    'auth-settings': 'admin/settings',
   },
 
   // Database options

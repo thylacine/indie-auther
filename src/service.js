@@ -33,29 +33,26 @@ class Service extends Dingus {
     this.authenticator = new Authenticator(logger, db, options);
     this.sessionManager = new SessionManager(logger, this.authenticator, options);
     this.resourceAuthenticator = new ResourceAuthenticator(logger, db, options);
-    this.loginPath = `${options.dingus.proxyPrefix}/admin/login`;
-
-    // N.B. /admin routes not currently configurable
-    const route = (r) => `/${options.route[r]}`; // eslint-disable-line security/detect-object-injection
+    this.loginPath = this._routeExternal('auth-login'); // eslint-disable-line sonarjs/no-duplicate-string
 
     // Service discovery
-    this.on(['GET'], route('metadata'), this.handlerGetMeta.bind(this));
+    this.on(['GET'], this._route('metadata'), this.handlerGetMeta.bind(this));
     // Also respond with metadata on well-known oauth2 endpoint if base has no prefix
     if ((options?.dingus?.selfBaseUrl?.match(/\//g) || []).length === 3) {
       this.on(['GET'], '/.well-known/oauth-authorization-server', this.handlerGetMeta.bind(this));
     }
 
     // Primary endpoints
-    this.on(['GET'], route('authorization'), this.handlerGetAuthorization.bind(this));
-    this.on(['POST'], route('authorization'), this.handlerPostAuthorization.bind(this));
-    this.on(['POST'], route('consent'), this.handlerPostConsent.bind(this));
-    this.on(['POST'], route('revocation'), this.handlerPostRevocation.bind(this));
-    this.on(['POST'], route('ticket'), this.handlerPostTicket.bind(this));
-    this.on(['POST'], route('token'), this.handlerPostToken.bind(this));
+    this.on(['GET'], this._route('authorization'), this.handlerGetAuthorization.bind(this));
+    this.on(['POST'], this._route('authorization'), this.handlerPostAuthorization.bind(this));
+    this.on(['POST'], this._route('consent'), this.handlerPostConsent.bind(this));
+    this.on(['POST'], this._route('revocation'), this.handlerPostRevocation.bind(this));
+    this.on(['POST'], this._route('ticket'), this.handlerPostTicket.bind(this));
+    this.on(['POST'], this._route('token'), this.handlerPostToken.bind(this));
 
     // Resource endpoints
-    this.on('POST', route('introspection'), this.handlerPostIntrospection.bind(this));
-    this.on('POST', route('userinfo'), this.handlerPostUserInfo.bind(this));
+    this.on('POST', this._route('introspection'), this.handlerPostIntrospection.bind(this));
+    this.on('POST', this._route('userinfo'), this.handlerPostUserInfo.bind(this));
 
     // Information page about service
     this.on(['GET'], '/', this.handlerGetRoot.bind(this));
@@ -64,35 +61,58 @@ class Service extends Dingus {
     this.on(['POST'], '/', this.handlerWhaGwan.bind(this));
 
     // Give load-balancers something to check
-    this.on(['GET'], route('healthcheck'), this.handlerGetHealthcheck.bind(this));
+    this.on(['GET'], this._route('healthcheck'), this.handlerGetHealthcheck.bind(this));
 
     // These routes are intended for accessing static content during development.
     // In production, a proxy server would likely handle these first.
-    this.on(['GET'], '/static', this.handlerRedirect.bind(this), `${options.dingus.proxyPrefix}/static/`);
-    this.on(['GET'], '/static/', this.handlerGetStaticFile.bind(this), 'index.html');
-    this.on(['GET'], '/static/:file', this.handlerGetStaticFile.bind(this));
+    this.on(['GET'], this._route('static'), this.handlerRedirect.bind(this), `${options.dingus.proxyPrefix}/static/`);
+    this.on(['GET'], this._route('static', ''), this.handlerGetStaticFile.bind(this), 'index.html');
+    this.on(['GET'], this._route('static', ':file'), this.handlerGetStaticFile.bind(this));
     this.on(['GET'], '/favicon.ico', this.handlerGetStaticFile.bind(this), 'favicon.ico');
     this.on(['GET'], '/robots.txt', this.handlerGetStaticFile.bind(this), 'robots.txt');
 
     // Profile and token management for authenticated sessions
-    this.on(['GET'], '/admin', this.handlerRedirect.bind(this), `${options.dingus.proxyPrefix}/admin/`);
-    this.on(['GET'], '/admin/', this.handlerGetAdmin.bind(this));
-    this.on(['POST'], '/admin/', this.handlerPostAdmin.bind(this));
+    this.on(['GET'], this._route('admin'), this.handlerRedirect.bind(this), `${options.dingus.proxyPrefix}/admin/`);
+    this.on(['GET'], this._route('admin', ''), this.handlerGetAdmin.bind(this));
+    this.on(['POST'], this._route('admin', ''), this.handlerPostAdmin.bind(this));
 
     // Ticket-proffering interface for authenticated sessions
-    this.on(['GET'], '/admin/ticket', this.handlerGetAdminTicket.bind(this));
-    this.on(['POST'], '/admin/ticket', this.handlerPostAdminTicket.bind(this));
+    this.on(['GET'], this._route('admin-ticket'), this.handlerGetAdminTicket.bind(this));
+    this.on(['POST'], this._route('admin-ticket'), this.handlerPostAdminTicket.bind(this));
 
     // User authentication and session establishment
-    this.on(['GET'], '/admin/login', this.handlerGetAdminLogin.bind(this));
-    this.on(['POST'], '/admin/login', this.handlerPostAdminLogin.bind(this));
-    this.on(['GET'], '/admin/logout', this.handlerGetAdminLogout.bind(this));
-    this.on(['GET'], '/admin/settings', this.handlerGetAdminSettings.bind(this));
-    this.on(['POST'], '/admin/settings', this.handlerPostAdminSettings.bind(this));
+    this.on(['GET'], this._route('auth-login'), this.handlerGetAdminLogin.bind(this));
+    this.on(['POST'], this._route('auth-login'), this.handlerPostAdminLogin.bind(this));
+    this.on(['GET'], this._route('auth-logout'), this.handlerGetAdminLogout.bind(this));
+    this.on(['GET'], this._route('auth-settings'), this.handlerGetAdminSettings.bind(this));
+    this.on(['POST'], this._route('auth-settings'), this.handlerPostAdminSettings.bind(this));
 
     // Page for upkeep info et cetera
-    this.on(['GET'], '/admin/maintenance', this.handlerGetAdminMaintenance.bind(this));
+    this.on(['GET'], this._route('admin-maintenance'), this.handlerGetAdminMaintenance.bind(this));
 
+  }
+
+
+  /**
+   * Returns the configured route path for the given route name.
+   * @param {string} r route name
+   * @param {string=} t trailer to append to route
+   * @returns {string} route path
+   */
+  _route(r, t) {
+    return `/${this.options.route[r]}${t !== undefined ? '/' + t : ''}`; // eslint-disable-line security/detect-object-injection
+
+  }
+
+
+  /**
+   * Returns the external route path for the given route name.
+   * @param {string} r route name
+   * @param {string=} t trailer to append to route
+   * @returns {string} route path
+   */
+  _routeExternal(r, t) {
+    return this.options.dingus.proxyPrefix + this._route(r, t);
   }
 
 
