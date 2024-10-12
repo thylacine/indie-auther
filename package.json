@@ -58,6 +58,6 @@
     "mocha-steps": "^1",
     "nyc": "^17",
     "pre-commit": "^1",
-    "sinon": "^18"
+    "sinon": "^19"
   }
 }
