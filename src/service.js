@@ -101,7 +101,6 @@ class Service extends Dingus {
    */
   _route(r, t) {
     return `/${this.options.route[r]}${t !== undefined ? '/' + t : ''}`; // eslint-disable-line security/detect-object-injection
-
   }
 
 
@@ -470,7 +469,7 @@ class Service extends Dingus {
 
     await this.ingestBody(req, res, ctx);
 
-    await this.manager.postRevocation(req, res, ctx);
+    await this.manager.postRevocation(res, ctx);
   }
 
 
